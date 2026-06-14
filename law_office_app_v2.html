@@ -1,0 +1,2995 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>دعم المحامي</title>
+<style>
+  :root{
+    --bg:#0a0a0c;
+    --bg2:#13110d;
+    --panel:#161310;
+    --gold:#d4af37;
+    --gold-light:#f0d978;
+    --gold-dim:#8a6f1f;
+    --text:#ecdfc0;
+    --text-dim:#a89878;
+    --border:#3a2f1a;
+    --danger:#a13a3a;
+    --success:#3a8a5a;
+    --info:#3a6f8a;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    font-family:'Segoe UI', Tahoma, Arial, sans-serif;
+    background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%);
+    color:var(--text);
+    min-height:100vh;
+    padding-bottom:70px;
+  }
+  header{
+    background:linear-gradient(135deg,#1a1610,#0e0c08);
+    border-bottom:2px solid var(--gold);
+    padding:16px;
+    text-align:center;
+    position:sticky;top:0;z-index:50;
+    box-shadow:0 2px 12px rgba(0,0,0,.6);
+  }
+  header h1{
+    color:var(--gold);
+    font-size:22px;
+    letter-spacing:1px;
+    text-shadow:0 0 10px rgba(212,175,55,.4);
+  }
+  header .sub{color:var(--text-dim);font-size:12px;margin-top:4px;}
+
+  .container{max-width:480px;margin:0 auto;padding:14px;}
+
+  .card{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:14px;
+    margin-bottom:12px;
+    box-shadow:0 2px 8px rgba(0,0,0,.4);
+  }
+  .card h3{color:var(--gold-light);font-size:15px;margin-bottom:8px;border-bottom:1px solid var(--border);padding-bottom:6px;}
+
+  .stats-row{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;}
+  .stat{
+    flex:1;min-width:90px;background:var(--panel);border:1px solid var(--gold-dim);
+    border-radius:10px;padding:10px;text-align:center;
+  }
+  .stat .num{color:var(--gold);font-size:20px;font-weight:bold;}
+  .stat .lbl{color:var(--text-dim);font-size:11px;margin-top:2px;}
+
+  input,select,textarea{
+    width:100%;background:#0e0c09;border:1px solid var(--border);
+    color:var(--text);padding:10px;border-radius:8px;margin-bottom:8px;
+    font-size:14px;
+  }
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold);}
+  label{display:block;color:var(--text-dim);font-size:12px;margin-bottom:4px;}
+
+  button{
+    background:linear-gradient(135deg,var(--gold-light),var(--gold));
+    color:#1a1408;border:none;padding:10px 16px;border-radius:8px;
+    font-weight:bold;cursor:pointer;font-size:14px;
+  }
+  button.secondary{background:transparent;border:1px solid var(--gold-dim);color:var(--gold-light);}
+  button.danger{background:var(--danger);color:#fff;}
+  button.full{width:100%;}
+
+  .item{
+    background:#0e0c09;border:1px solid var(--border);border-radius:8px;
+    padding:10px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;
+    gap:8px;
+  }
+  .item .info{flex:1;min-width:0;}
+  .item .info b{color:var(--gold-light);font-size:14px;}
+  .item .info .meta{color:var(--text-dim);font-size:12px;margin-top:2px;}
+  .item .actions{display:flex;gap:6px;flex-shrink:0;}
+  .item .actions button{padding:6px 10px;font-size:12px;}
+
+  .badge{display:inline-block;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:bold;}
+  .badge.active{background:rgba(58,138,90,.2);color:var(--success);}
+  .badge.closed{background:rgba(161,58,58,.2);color:var(--danger);}
+  .badge.pending{background:rgba(212,175,55,.2);color:var(--gold);}
+  .badge.info{background:rgba(58,111,138,.2);color:#6fb8e0;}
+
+  .search-box{display:flex;gap:8px;margin-bottom:10px;}
+  .search-box input{margin-bottom:0;}
+
+  nav{
+    position:fixed;bottom:0;left:0;right:0;
+    background:linear-gradient(135deg,#1a1610,#0e0c08);
+    border-top:2px solid var(--gold);
+    display:flex;justify-content:flex-start;padding:8px 4px;z-index:50;
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+  }
+  nav button{
+    background:none;border:none;color:var(--text-dim);
+    font-size:11px;display:flex;flex-direction:column;align-items:center;gap:2px;
+    padding:4px 10px;flex-shrink:0;white-space:nowrap;
+  }
+  nav button.active{color:var(--gold);}
+  nav button .icon{font-size:18px;}
+
+  .empty{text-align:center;color:var(--text-dim);padding:30px 10px;font-size:13px;}
+  .empty .icon{font-size:36px;margin-bottom:8px;display:block;}
+
+  .modal-bg{
+    display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);
+    z-index:100;align-items:center;justify-content:center;
+  }
+  .modal-bg.open{display:flex;}
+  .modal{
+    background:var(--bg2);border:1px solid var(--gold-dim);border-radius:12px;
+    padding:18px;width:92%;max-width:440px;max-height:85vh;overflow-y:auto;
+  }
+  .modal h3{color:var(--gold);margin-bottom:12px;}
+  .modal-actions{display:flex;gap:8px;margin-top:10px;}
+  .modal-actions button{flex:1;}
+
+  .tabs-row{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;}
+  .tabs-row button{padding:6px 12px;font-size:12px;}
+  .tabs-row button.secondary{opacity:.6;}
+  .tabs-row button:not(.secondary){opacity:1;}
+  .tabs-row button.tab-active{opacity:1;background:linear-gradient(135deg,var(--gold-light),var(--gold));color:#1a1408;}
+
+  .page{display:none;}
+  .page.active{display:block;}
+
+  .toast{
+    position:fixed;bottom:80px;left:50%;transform:translateX(-50%);
+    background:var(--gold);color:#1a1408;padding:10px 20px;border-radius:20px;
+    font-size:13px;font-weight:bold;z-index:200;opacity:0;transition:opacity .3s;
+    pointer-events:none;
+    max-width:90%;text-align:center;
+  }
+  .toast.show{opacity:1;}
+
+  /* ===== New module styles ===== */
+  .submenu-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px;}
+  .submenu-grid button{padding:14px 8px;font-size:13px;display:flex;flex-direction:column;align-items:center;gap:4px;}
+  .submenu-grid button .icon{font-size:22px;}
+  .submenu-grid button.secondary{background:#0e0c09;}
+
+  .embed-frame{
+    width:100%;height:60vh;border:1px solid var(--border);border-radius:8px;
+    background:#000;
+  }
+  .embed-placeholder{
+    border:1px dashed var(--gold-dim);border-radius:8px;padding:24px;text-align:center;
+    color:var(--text-dim);font-size:13px;background:#0e0c09;
+  }
+  .embed-placeholder .icon{font-size:30px;display:block;margin-bottom:8px;}
+
+  .progress-track{
+    display:flex;flex-direction:column;gap:0;margin:10px 0;
+  }
+  .progress-step{
+    display:flex;gap:10px;align-items:flex-start;position:relative;padding-bottom:18px;
+  }
+  .progress-step:last-child{padding-bottom:0;}
+  .progress-step .dot{
+    width:22px;height:22px;border-radius:50%;border:2px solid var(--border);
+    background:#0e0c09;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+    font-size:12px;color:var(--text-dim);font-weight:bold;
+  }
+  .progress-step.done .dot{background:var(--success);border-color:var(--success);color:#fff;}
+  .progress-step.current .dot{background:var(--gold);border-color:var(--gold);color:#1a1408;box-shadow:0 0 0 4px rgba(212,175,55,.15);}
+  .progress-step:not(:last-child)::before{
+    content:'';position:absolute;right:11px;top:24px;width:2px;height:calc(100% - 22px);
+    background:var(--border);
+  }
+  .progress-step.done:not(:last-child)::before{background:var(--success);}
+  .progress-step .step-content{flex:1;padding-top:1px;}
+  .progress-step .step-title{font-size:13px;font-weight:bold;color:var(--text);}
+  .progress-step.current .step-title{color:var(--gold-light);}
+  .progress-step .step-date{font-size:11px;color:var(--text-dim);margin-top:2px;}
+  .progress-step .step-notes{font-size:12px;color:var(--text-dim);margin-top:4px;}
+
+  .fin-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
+  .fin-summary .box{background:#0e0c09;border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;}
+  .fin-summary .box .v{font-size:16px;font-weight:bold;}
+  .fin-summary .box .l{font-size:11px;color:var(--text-dim);margin-top:2px;}
+  .fin-summary .box.income .v{color:var(--success);}
+  .fin-summary .box.expense .v{color:var(--danger);}
+  .fin-summary .box.balance .v{color:var(--gold);}
+
+  .radio-player{
+    background:#0e0c09;border:1px solid var(--gold-dim);border-radius:10px;
+    padding:14px;margin-bottom:10px;text-align:center;
+  }
+  .radio-player .station-name{color:var(--gold-light);font-weight:bold;margin-bottom:8px;}
+  .radio-player audio{width:100%;}
+  .radio-player iframe{width:100%;height:80px;border:none;border-radius:8px;}
+
+  .law-pdf-item{display:flex;align-items:center;gap:10px;}
+  .law-pdf-item .file-icon{font-size:24px;color:var(--danger);flex-shrink:0;}
+
+  .template-preview{
+    background:#fff;color:#111;border-radius:8px;padding:16px;font-size:13px;line-height:1.9;
+    max-height:50vh;overflow-y:auto;font-family:'Segoe UI',Tahoma,Arial,sans-serif;
+  }
+  .template-preview h4{text-align:center;margin-bottom:10px;}
+
+  .directory-item .icon-circle{
+    width:36px;height:36px;border-radius:50%;background:#0e0c09;border:1px solid var(--gold-dim);
+    display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>⚖️ دعم المحامي</h1>
+  <div class="sub">نظام إدارة مكتب المحاماة الذكي</div>
+  <div class="sub" id="cloud-status" style="margin-top:2px;">🟢 التخزين المحلي يعمل</div>
+  <button class="secondary" style="position:absolute;left:14px;top:14px;padding:6px 10px;" onclick="openSettings()">⚙️</button>
+</header>
+
+<div class="container">
+
+  <!-- ============ HOME ============ -->
+  <div class="page active" id="page-home">
+    <div class="stats-row">
+      <div class="stat"><div class="num" id="stat-clients">0</div><div class="lbl">الموكلين</div></div>
+      <div class="stat"><div class="num" id="stat-cases">0</div><div class="lbl">القضايا</div></div>
+      <div class="stat"><div class="num" id="stat-sessions">0</div><div class="lbl">الجلسات</div></div>
+    </div>
+
+    <div class="submenu-grid">
+      <button onclick="showPageDirect('finance')"><span class="icon">💰</span>المالية</button>
+      <button onclick="showPageDirect('execution')"><span class="icon">🏛️</span>تنفيذ الأحكام</button>
+      <button onclick="showPageDirect('bailiff')"><span class="icon">📜</span>أعمال المحضرين</button>
+      <button onclick="showPageDirect('library')"><span class="icon">📚</span>المكتبة القانونية</button>
+      <button onclick="showPageDirect('forms')"><span class="icon">📝</span>مكتبة الصيغ</button>
+      <button onclick="showPageDirect('directory')"><span class="icon">🏢</span>دليل الجهات</button>
+      <button onclick="showPageDirect('portals')"><span class="icon">🌐</span>البوابات الإلكترونية</button>
+      <button onclick="showPageDirect('radio')"><span class="icon">📻</span>الراديو الروحاني</button>
+    </div>
+
+    <div class="card">
+      <h3>📅 الجلسات القادمة</h3>
+      <div id="upcoming-sessions"></div>
+    </div>
+
+    <div class="card">
+      <h3>📁 آخر القضايا</h3>
+      <div id="recent-cases"></div>
+    </div>
+  </div>
+
+  <!-- ============ CLIENTS ============ -->
+  <div class="page" id="page-clients">
+    <div class="search-box">
+      <input type="text" id="client-search" placeholder="بحث بالاسم أو الهاتف أو الرقم القومي...">
+    </div>
+    <button class="full" onclick="openClientModal()">+ إضافة موكل جديد</button>
+    <div style="margin-top:12px;" id="clients-list"></div>
+  </div>
+
+  <!-- ============ CASES ============ -->
+  <div class="page" id="page-cases">
+    <div class="search-box">
+      <input type="text" id="case-search" placeholder="بحث في القضايا...">
+    </div>
+    <button class="full" onclick="openCaseModal()">+ إضافة قضية جديدة</button>
+    <div style="margin-top:12px;" id="cases-list"></div>
+  </div>
+
+  <!-- ============ CASE DETAIL ============ -->
+  <div class="page" id="page-case-detail">
+    <button class="secondary" onclick="showPageDirect('cases')">→ رجوع للقضايا</button>
+    <div id="case-detail-content" style="margin-top:10px;"></div>
+  </div>
+
+  <!-- ============ CLIENT CHAT ============ -->
+  <div class="page" id="page-chat">
+    <button class="secondary" onclick="showPageDirect('clients')">→ رجوع للموكلين</button>
+    <div class="card" style="margin-top:10px;">
+      <h3 id="chat-client-name">💬 محادثة</h3>
+      <div id="chat-messages" style="max-height:50vh;overflow-y:auto;margin-bottom:10px;"></div>
+      <div style="display:flex;gap:8px;">
+        <input type="text" id="chat-input" placeholder="اكتب رسالة..." style="margin-bottom:0;" onkeydown="if(event.key==='Enter')sendChatMsg()">
+        <button onclick="sendChatMsg()">إرسال</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ SESSIONS ============ -->
+  <div class="page" id="page-sessions">
+    <button class="full" onclick="openSessionModal()">+ إضافة جلسة جديدة</button>
+    <div style="margin-top:12px;" id="sessions-list"></div>
+  </div>
+
+  <!-- ============ DOCUMENTS ============ -->
+  <div class="page" id="page-docs">
+    <button class="full" onclick="openDocModal()">+ إضافة مستند</button>
+    <div style="margin-top:12px;" id="docs-list"></div>
+  </div>
+
+  <!-- ============ AI ASSISTANT ============ -->
+  <div class="page" id="page-ai">
+    <div class="card">
+      <h3>🤖 المساعد القانوني الذكي</h3>
+      <div id="ai-messages" style="max-height:50vh;overflow-y:auto;margin-bottom:10px;"></div>
+      <div style="display:flex;gap:8px;">
+        <input type="text" id="ai-input" placeholder="اكتب استفسارك القانوني..." style="margin-bottom:0;" onkeydown="if(event.key==='Enter')sendAI()">
+        <button onclick="sendAI()">إرسال</button>
+        <button class="secondary" onclick="toggleMic()" id="mic-btn">🎤</button>
+      </div>
+      <div style="margin-top:8px;display:flex;gap:8px;">
+        <button class="secondary full" onclick="webSearchAI()">🔍 بحث قانوني بالإنترنت</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ DOCUMENT EDITOR ============ -->
+  <div class="page" id="page-editor">
+    <div class="card">
+      <h3>✍️ محرر المستندات</h3>
+      <input type="text" id="editor-title" placeholder="عنوان المستند" style="font-weight:bold;">
+      <div class="tabs-row">
+        <button class="secondary" onclick="fmt('bold')"><b>B</b></button>
+        <button class="secondary" onclick="fmt('italic')"><i>I</i></button>
+        <button class="secondary" onclick="fmt('underline')"><u>U</u></button>
+        <button class="secondary" onclick="fmt('insertUnorderedList')">• قائمة</button>
+        <button class="secondary" onclick="fmt('justifyRight')">⇥ يمين</button>
+        <button class="secondary" onclick="fmt('justifyCenter')">⇔ وسط</button>
+      </div>
+      <div id="editor-area" contenteditable="true" style="min-height:220px;background:#0e0c09;border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:10px;line-height:1.8;" placeholder="ابدأ الكتابة..."></div>
+      <div class="tabs-row">
+        <button onclick="saveEditorDoc()">💾 حفظ كمستند</button>
+        <button class="secondary" onclick="printEditorDoc()">🖨️ طباعة / PDF</button>
+        <button class="secondary" onclick="copyEditorDoc()">📋 نسخ</button>
+      </div>
+      <div class="tabs-row">
+        <button class="secondary" onclick="shareEditorDoc('whatsapp')">📱 واتساب</button>
+        <button class="secondary" onclick="shareEditorDoc('telegram')">✈️ تليجرام</button>
+        <button class="secondary" onclick="shareEditorDoc('email')">✉️ بريد إلكتروني</button>
+      </div>
+    </div>
+    <div class="card">
+      <h3>📑 قوالب جاهزة</h3>
+      <div class="tabs-row">
+        <button class="secondary" onclick="loadTemplate('power')">توكيل</button>
+        <button class="secondary" onclick="loadTemplate('warning')">إنذار</button>
+        <button class="secondary" onclick="loadTemplate('claim')">صحيفة دعوى</button>
+        <button class="secondary" onclick="loadTemplate('memo')">مذكرة دفاع</button>
+        <button class="secondary" onclick="loadTemplate('contract')">عقد</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ NOTIFICATIONS ============ -->
+  <div class="page" id="page-notif">
+    <div class="card">
+      <h3>🔔 التنبيهات والتذكيرات</h3>
+      <div id="notif-list"></div>
+    </div>
+  </div>
+
+  <!-- ============ TEAM ============ -->
+  <div class="page" id="page-team">
+    <button class="full" onclick="openTeamModal()">+ إضافة عضو للفريق</button>
+    <div style="margin-top:12px;" id="team-list"></div>
+
+    <div class="card" style="margin-top:14px;">
+      <h3>💬 محادثة الفريق الداخلية</h3>
+      <p style="font-size:12px;color:var(--text-dim);">قناة مشتركة بين مالك المكتب وكل أعضاء الفريق - لتنسيق العمل ومتابعة المهام. محفوظة على هذا الجهاز.</p>
+      <label>أنت تتحدث بصفتك:</label>
+      <select id="team-chat-as"></select>
+      <div id="team-chat-messages" style="max-height:40vh;overflow-y:auto;margin:10px 0;"></div>
+      <div style="display:flex;gap:8px;">
+        <input type="text" id="team-chat-input" placeholder="اكتب رسالة للفريق..." style="margin-bottom:0;" onkeydown="if(event.key==='Enter')sendTeamChatMsg()">
+        <button onclick="sendTeamChatMsg()">إرسال</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ FINANCE ============ -->
+  <div class="page" id="page-finance">
+    <button class="secondary" onclick="showPageDirect('home')">→ الرئيسية</button>
+    <div class="card" style="margin-top:10px;">
+      <h3>💰 ملخص المالية</h3>
+      <div class="fin-summary">
+        <div class="box income"><div class="v" id="fin-income">0</div><div class="l">الإيرادات (ج.م)</div></div>
+        <div class="box expense"><div class="v" id="fin-expense">0</div><div class="l">المصروفات (ج.م)</div></div>
+        <div class="box balance"><div class="v" id="fin-balance">0</div><div class="l">الصافي (ج.م)</div></div>
+      </div>
+      <div id="fin-share-toolbar"></div>
+    </div>
+    <div class="tabs-row">
+      <button onclick="openFinModal('income')">+ تسجيل دفعة أتعاب</button>
+      <button class="secondary" onclick="openFinModal('expense')">+ تسجيل مصروف</button>
+    </div>
+    <div class="card">
+      <h3>📋 سجل الحركات المالية</h3>
+      <div id="finance-list"></div>
+    </div>
+  </div>
+
+  <!-- ============ EXECUTION OF JUDGMENTS ============ -->
+  <div class="page" id="page-execution">
+    <button class="secondary" onclick="showPageDirect('home')">→ الرئيسية</button>
+    <div class="card" style="margin-top:10px;">
+      <h3>🏛️ تنفيذ الأحكام (مدني / جنائي)</h3>
+      <p style="font-size:12px;color:var(--text-dim);">اختر القضية لإدارة مراحل تنفيذ الحكم الخاص بها</p>
+      <select id="execution-case-select" onchange="renderExecutionTrack()"></select>
+      <div id="execution-no-cases-hint" style="display:none;margin-top:8px;">
+        <div class="embed-placeholder">
+          <span class="icon">⚖️</span>
+          لا توجد أي قضايا مسجلة بعد. أضف قضية أولاً من صفحة "القضايا" ثم عُد هنا لتتبع مراحل تنفيذ حكمها.
+          <div style="margin-top:10px;"><button onclick="showPageDirect('cases')">+ الانتقال لإضافة قضية</button></div>
+        </div>
+      </div>
+    </div>
+    <div class="card" id="execution-track-card" style="display:none;">
+      <h3>مراحل التنفيذ</h3>
+      <div class="tabs-row" id="execution-type-tabs">
+        <button onclick="setExecutionType('civil')" id="exec-tab-civil">تنفيذ مدني</button>
+        <button class="secondary" onclick="setExecutionType('criminal')" id="exec-tab-criminal">تنفيذ جنائي</button>
+      </div>
+      <div class="progress-track" id="execution-progress"></div>
+      <button class="full" onclick="advanceExecutionStep()">➡️ الانتقال للمرحلة التالية</button>
+      <div style="margin-top:8px;">
+        <label>ملاحظات على المرحلة الحالية</label>
+        <textarea id="execution-step-notes" rows="2" placeholder="تفاصيل إضافية عن الإجراء الحالي"></textarea>
+        <button class="secondary full" onclick="saveExecutionNotes()">حفظ الملاحظات</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ BAILIFF ACTIONS ============ -->
+  <div class="page" id="page-bailiff">
+    <button class="secondary" onclick="showPageDirect('home')">→ الرئيسية</button>
+    <button class="full" style="margin-top:10px;" onclick="openBailiffModal()">+ تسجيل إجراء محضرين جديد</button>
+    <div style="margin-top:12px;" id="bailiff-list"></div>
+  </div>
+
+  <!-- ============ LEGAL LIBRARY (LAWS PDF) ============ -->
+  <div class="page" id="page-library">
+    <button class="secondary" onclick="showPageDirect('home')">→ الرئيسية</button>
+    <div class="search-box" style="margin-top:10px;">
+      <input type="text" id="library-search" placeholder="بحث عن قانون أو تشريع...">
+    </div>
+    <button class="full" onclick="openLibraryModal()">+ إضافة قانون / تشريع (PDF)</button>
+    <p style="font-size:11px;color:var(--text-dim);margin:8px 0;">
+      💡 يمكنك إضافة ملفات القوانين بصيغة PDF (كرابط مباشر للملف أو رفعه محليًا). تُحفظ هنا لتكون مرجعًا دائمًا داخل التطبيق.
+    </p>
+    <div id="library-list"></div>
+  </div>
+
+  <!-- ============ FORMS / TEMPLATES LIBRARY ============ -->
+  <div class="page" id="page-forms">
+    <button class="secondary" onclick="showPageDirect('home')">→ الرئيسية</button>
+    <div class="card" style="margin-top:10px;">
+      <h3>📝 مكتبة الصيغ القانونية</h3>
+      <p style="font-size:12px;color:var(--text-dim);">صيغ جاهزة للدعاوى والعقود والمذكرات — اختر الصيغة لمعاينتها ثم افتحها في المحرر للتعديل</p>
+    </div>
+    <div class="tabs-row" id="forms-category-tabs">
+      <button onclick="setFormsCategory('lawsuits')" id="forms-tab-lawsuits">صحف الدعاوى</button>
+      <button class="secondary" onclick="setFormsCategory('memos')" id="forms-tab-memos">المذكرات</button>
+      <button class="secondary" onclick="setFormsCategory('contracts')" id="forms-tab-contracts">العقود</button>
+      <button class="secondary" onclick="setFormsCategory('poa')" id="forms-tab-poa">التوكيلات والإنذارات</button>
+    </div>
+    <div id="forms-list"></div>
+    <div class="card" id="forms-preview-card" style="display:none;">
+      <h3 id="forms-preview-title">معاينة الصيغة</h3>
+      <div class="template-preview" id="forms-preview-content"></div>
+      <div id="forms-share-toolbar"></div>
+      <div class="tabs-row" style="margin-top:10px;">
+        <button onclick="openFormInEditor()">✍️ فتح في المحرر للتعديل</button>
+        <button class="secondary" onclick="document.getElementById('forms-preview-card').style.display='none'">إغلاق المعاينة</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ DIRECTORY (Courts / Police / Prosecution) ============ -->
+  <div class="page" id="page-directory">
+    <button class="secondary" onclick="showPageDirect('home')">→ الرئيسية</button>
+    <div class="tabs-row" style="margin-top:10px;" id="directory-category-tabs">
+      <button onclick="setDirectoryCategory('courts')" id="dir-tab-courts">🏛️ المحاكم</button>
+      <button class="secondary" onclick="setDirectoryCategory('police')" id="dir-tab-police">🚓 أقسام الشرطة</button>
+      <button class="secondary" onclick="setDirectoryCategory('prosecution')" id="dir-tab-prosecution">⚖️ النيابات العامة</button>
+    </div>
+    <div class="search-box">
+      <input type="text" id="directory-search" placeholder="بحث بالاسم أو المحافظة...">
+    </div>
+    <button class="full" onclick="openDirectoryModal()">+ إضافة جهة جديدة</button>
+    <p style="font-size:11px;color:var(--text-dim);margin:8px 0;">
+      💡 سجل بيانات الاتصال (الاسم، الموقع، التليفون، البريد الإلكتروني) للجهات التي تتعامل معها بشكل متكرر، لتكون مرجعًا سريعًا داخل التطبيق.
+    </p>
+    <div id="directory-list"></div>
+  </div>
+
+  <!-- ============ ELECTRONIC PORTALS (embedded iframes) ============ -->
+  <div class="page" id="page-portals">
+    <button class="secondary" onclick="showPageDirect('home')">→ الرئيسية</button>
+    <div class="card" style="margin-top:10px;">
+      <h3>🌐 البوابات والمحاكم الإلكترونية</h3>
+      <p style="font-size:12px;color:var(--text-dim);">اضغط على أي بوابة لإضافة رابطها — سيتم حفظ الرابط وتشغيله داخل التطبيق مباشرة (Embed) دون مغادرته.</p>
+    </div>
+    <div id="portals-list"></div>
+  </div>
+
+  <!-- Portal Embed Viewer Page -->
+  <div class="page" id="page-portal-viewer">
+    <button class="secondary" onclick="showPageDirect('portals')">→ رجوع للبوابات</button>
+    <div class="card" style="margin-top:10px;">
+      <h3 id="portal-viewer-title">البوابة</h3>
+      <div id="portal-viewer-body"></div>
+    </div>
+  </div>
+
+  <!-- ============ SPIRITUAL RADIO (5 fixed embed slots) ============ -->
+  <div class="page" id="page-radio">
+    <button class="secondary" onclick="showPageDirect('home')">→ الرئيسية</button>
+    <div class="card" style="margin-top:10px;">
+      <h3>📻 الراديو الروحاني</h3>
+      <p style="font-size:12px;color:var(--text-dim);">5 محطات يمكنك تخصيص روابطها — تعمل مباشرة (Embed) داخل التطبيق بدون نوافذ منبثقة أو مغادرة الصفحة.</p>
+    </div>
+    <div id="radio-list"></div>
+  </div>
+
+  <!-- ============ BING SEARCH BROWSER (full-page, isolated) ============ -->
+  <div class="page" id="page-bing">
+    <button class="secondary" onclick="closeBingSearch()">→ رجوع (بدون اختيار رابط)</button>
+    <div class="card" style="margin-top:10px;">
+      <h3>🔎 البحث عبر Bing</h3>
+      <p style="font-size:12px;color:var(--text-dim);">ابحث، تصفّح، ثم اضغط "استخدام هذا الرابط" بعد فتح الصفحة التي تريدها (مثل صفحة بث الإذاعة أو الفيديو) لإرجاع رابطها تلقائياً للحقل الذي فتحت البحث منه.</p>
+      <div style="display:flex;gap:8px;">
+        <input type="text" id="bing-search-query" placeholder="اكتب كلمات البحث..." style="margin-bottom:0;" onkeydown="if(event.key==='Enter')runBingSearch()">
+        <button onclick="runBingSearch()">بحث</button>
+      </div>
+    </div>
+    <div class="card">
+      <iframe id="bing-frame" src="" style="width:100%;height:55vh;border:none;border-radius:8px;background:#fff;" loading="lazy" referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-presentation allow-top-navigation-by-user-activation"></iframe>
+      <label style="margin-top:10px;">رابط الصفحة الحالية (انسخه أو استخدمه مباشرة)</label>
+      <input type="url" id="bing-current-url" placeholder="https://...">
+      <div class="tabs-row">
+        <button onclick="useBingCurrentUrl()">✅ استخدام هذا الرابط</button>
+        <button class="secondary" onclick="copyBingCurrentUrl()">📋 نسخ الرابط</button>
+      </div>
+      <p style="font-size:11px;color:var(--text-dim);">💡 لأن المتصفحات لا تسمح بقراءة الرابط داخل إطار Bing تلقائياً (لأسباب أمنية)، يُرجى لصق رابط الصفحة التي تريدها يدوياً في الخانة أعلاه بعد الوصول إليها، ثم اضغط "استخدام هذا الرابط".</p>
+    </div>
+  </div>
+
+</div>
+
+<nav>
+  <button class="active" onclick="showPage('home')"><span class="icon">🏠</span>الرئيسية</button>
+  <button onclick="showPage('clients')"><span class="icon">👤</span>الموكلين</button>
+  <button onclick="showPage('cases')"><span class="icon">⚖️</span>القضايا</button>
+  <button onclick="showPage('sessions')"><span class="icon">📅</span>الجلسات</button>
+  <button onclick="showPage('docs')"><span class="icon">📄</span>المستندات</button>
+  <button onclick="showPage('finance')"><span class="icon">💰</span>المالية</button>
+  <button onclick="showPage('execution')"><span class="icon">🏛️</span>تنفيذ الأحكام</button>
+  <button onclick="showPage('bailiff')"><span class="icon">📜</span>المحضرين</button>
+  <button onclick="showPage('library')"><span class="icon">📚</span>المكتبة</button>
+  <button onclick="showPage('forms')"><span class="icon">📝</span>الصيغ</button>
+  <button onclick="showPage('directory')"><span class="icon">🏢</span>الجهات</button>
+  <button onclick="showPage('portals')"><span class="icon">🌐</span>البوابات</button>
+  <button onclick="showPage('ai')"><span class="icon">🤖</span>المساعد</button>
+  <button onclick="showPage('editor')"><span class="icon">✍️</span>المحرر</button>
+  <button onclick="showPage('radio')"><span class="icon">📻</span>الراديو</button>
+  <button onclick="showPage('notif')"><span class="icon">🔔</span>التنبيهات</button>
+  <button onclick="showPage('team')"><span class="icon">👥</span>الفريق</button>
+</nav>
+
+<!-- ===== Client Modal ===== -->
+<div class="modal-bg" id="modal-client">
+  <div class="modal">
+    <h3 id="client-modal-title">إضافة موكل جديد</h3>
+    <input type="hidden" id="client-id">
+    <label>نوع الموكل</label>
+    <select id="client-type">
+      <option value="فرد">فرد (طبيعي)</option>
+      <option value="شركة">شركة (اعتباري)</option>
+    </select>
+    <label>الاسم / اسم الشركة</label>
+    <input type="text" id="client-name" placeholder="مثال: أحمد محمد علي">
+    <label>رقم الهاتف</label>
+    <input type="text" id="client-phone" placeholder="01xxxxxxxxx">
+    <label>الرقم القومي / السجل التجاري</label>
+    <input type="text" id="client-national" placeholder="14 رقم">
+    <label>العنوان</label>
+    <input type="text" id="client-address" placeholder="العنوان بالتفصيل">
+    <label>ملاحظات</label>
+    <textarea id="client-notes" rows="2" placeholder="ملاحظات إضافية"></textarea>
+    <div class="modal-actions">
+      <button class="secondary" onclick="closeModal('modal-client')">إلغاء</button>
+      <button onclick="saveClient()">حفظ</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Case Modal ===== -->
+<div class="modal-bg" id="modal-case">
+  <div class="modal">
+    <h3 id="case-modal-title">إضافة قضية جديدة</h3>
+    <input type="hidden" id="case-id">
+    <label>رقم القضية</label>
+    <input type="text" id="case-number" placeholder="مثال: 1234 لسنة 2026">
+    <label>الموكل</label>
+    <select id="case-client"></select>
+    <label>نوع القضية</label>
+    <input type="text" id="case-type" placeholder="مثال: مدني / جنائي / عمالي">
+    <label>المحكمة</label>
+    <input type="text" id="case-court" placeholder="مثال: محكمة شمال القاهرة">
+    <label>الخصم</label>
+    <input type="text" id="case-opponent" placeholder="اسم الخصم">
+    <label>محامي الخصم</label>
+    <input type="text" id="case-opponent-lawyer" placeholder="اسم محامي الخصم">
+    <label>حالة القضية</label>
+    <select id="case-status">
+      <option value="active">منظورة</option>
+      <option value="pending">معلقة</option>
+      <option value="closed">منتهية</option>
+    </select>
+    <label>الأتعاب المتفق عليها (جنيه)</label>
+    <input type="number" id="case-fee-total" placeholder="0">
+    <label>المدفوع حتى الآن (جنيه)</label>
+    <input type="number" id="case-fee-paid" placeholder="0">
+    <label>تفاصيل / ملخص</label>
+    <textarea id="case-notes" rows="3" placeholder="ملخص موضوع القضية"></textarea>
+    <div class="modal-actions">
+      <button class="secondary" onclick="closeModal('modal-case')">إلغاء</button>
+      <button onclick="saveCase()">حفظ</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Session Modal ===== -->
+<div class="modal-bg" id="modal-session">
+  <div class="modal">
+    <h3 id="session-modal-title">إضافة جلسة جديدة</h3>
+    <input type="hidden" id="session-id">
+    <label>القضية</label>
+    <select id="session-case"></select>
+    <label>نوع الجلسة</label>
+    <select id="session-type">
+      <option value="جلسة محكمة">جلسة محكمة</option>
+      <option value="جلسة خبير">جلسة خبير</option>
+      <option value="استشارة">استشارة موكل</option>
+    </select>
+    <label>التاريخ والوقت</label>
+    <input type="datetime-local" id="session-date">
+    <label>نتيجة الجلسة (إن وُجدت)</label>
+    <select id="session-result">
+      <option value="">— لم تُحدد بعد —</option>
+      <option value="تأجلت">تأجلت الجلسة</option>
+      <option value="حضور">تم الحضور - بدون قرار</option>
+      <option value="مرافعة">تمت المرافعة / حجزت للحكم</option>
+      <option value="صدر حكم">صدر حكم</option>
+      <option value="شطب">شطب / ترك الدعوى</option>
+      <option value="أخرى">نتيجة أخرى</option>
+    </select>
+    <label>تفاصيل النتيجة / القرار</label>
+    <textarea id="session-result-notes" rows="2" placeholder="مثال: تأجلت لجلسة 2026/07/01 لتقديم مستندات / صدر الحكم بـ..."></textarea>
+    <label>ملاحظات الجلسة</label>
+    <textarea id="session-notes" rows="2" placeholder="ما المطلوب في هذه الجلسة"></textarea>
+    <div class="modal-actions">
+      <button class="secondary" onclick="closeModal('modal-session')">إلغاء</button>
+      <button onclick="saveSession()">حفظ</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Document Modal ===== -->
+<div class="modal-bg" id="modal-doc">
+  <div class="modal">
+    <h3>إضافة مستند</h3>
+    <input type="hidden" id="doc-id">
+    <label>اسم المستند</label>
+    <input type="text" id="doc-name" placeholder="مثال: صحيفة الدعوى">
+    <label>مرتبط بالقضية</label>
+    <select id="doc-case"></select>
+    <label>نوع المستند</label>
+    <input type="text" id="doc-type" placeholder="مثال: عقد / إنذار / مذكرة">
+    <label>ملاحظات</label>
+    <textarea id="doc-notes" rows="2" placeholder="وصف المستند"></textarea>
+    <div class="modal-actions">
+      <button class="secondary" onclick="closeModal('modal-doc')">إلغاء</button>
+      <button onclick="saveDoc()">حفظ</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Team Modal ===== -->
+<div class="modal-bg" id="modal-team">
+  <div class="modal">
+    <h3 id="team-modal-title">إضافة عضو للفريق</h3>
+    <input type="hidden" id="team-id">
+    <label>الاسم</label>
+    <input type="text" id="team-name" placeholder="اسم العضو">
+    <label>البريد الإلكتروني</label>
+    <input type="text" id="team-email" placeholder="example@email.com">
+    <label>الدور</label>
+    <select id="team-role">
+      <option value="owner">مالك المكتب</option>
+      <option value="lawyer">محامي</option>
+      <option value="assistant">مساعد قانوني</option>
+      <option value="secretary">سكرتارية</option>
+    </select>
+    <label>الصلاحيات</label>
+    <div style="display:flex;flex-direction:column;gap:6px;background:#0e0c09;border:1px solid var(--border);border-radius:8px;padding:10px;margin-bottom:8px;">
+      <label style="display:flex;align-items:center;gap:8px;margin:0;"><input type="checkbox" id="perm-clients" style="width:auto;margin:0;"> إضافة وتعديل الموكلين</label>
+      <label style="display:flex;align-items:center;gap:8px;margin:0;"><input type="checkbox" id="perm-cases" style="width:auto;margin:0;"> إضافة وتعديل القضايا</label>
+      <label style="display:flex;align-items:center;gap:8px;margin:0;"><input type="checkbox" id="perm-docs" style="width:auto;margin:0;"> إدارة المستندات</label>
+      <label style="display:flex;align-items:center;gap:8px;margin:0;"><input type="checkbox" id="perm-chat" style="width:auto;margin:0;"> التواصل مع الموكلين</label>
+      <label style="display:flex;align-items:center;gap:8px;margin:0;"><input type="checkbox" id="perm-finance" style="width:auto;margin:0;"> الوصول للبيانات المالية</label>
+    </div>
+    <div class="modal-actions">
+      <button class="secondary" onclick="closeModal('modal-team')">إلغاء</button>
+      <button onclick="saveTeam()">حفظ</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Settings Modal (API key) ===== -->
+<div class="modal-bg" id="modal-settings">
+  <div class="modal">
+    <h3>⚙️ إعدادات المساعد الذكي</h3>
+    <label>مفتاح Claude API (يُحفظ على جهازك فقط)</label>
+    <input type="password" id="api-key-input" placeholder="sk-ant-...">
+    <div class="modal-actions">
+      <button class="secondary" onclick="closeModal('modal-settings')">إلغاء</button>
+      <button onclick="saveApiKey()">حفظ</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Finance Modal ===== -->
+<div class="modal-bg" id="modal-fin">
+  <div class="modal">
+    <h3 id="fin-modal-title">تسجيل حركة مالية</h3>
+    <input type="hidden" id="fin-id">
+    <input type="hidden" id="fin-kind">
+    <label>مرتبطة بالقضية (اختياري)</label>
+    <select id="fin-case"></select>
+    <label>الوصف</label>
+    <input type="text" id="fin-desc" placeholder="مثال: دفعة أولى من الأتعاب">
+    <label>المبلغ (جنيه)</label>
+    <input type="number" id="fin-amount" placeholder="0">
+    <label>التاريخ</label>
+    <input type="date" id="fin-date">
+    <label>ملاحظات</label>
+    <textarea id="fin-notes" rows="2" placeholder="ملاحظات إضافية"></textarea>
+    <div class="modal-actions">
+      <button class="secondary" onclick="closeModal('modal-fin')">إلغاء</button>
+      <button onclick="saveFin()">حفظ</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Bailiff Modal ===== -->
+<div class="modal-bg" id="modal-bailiff">
+  <div class="modal">
+    <h3 id="bailiff-modal-title">تسجيل إجراء محضرين</h3>
+    <input type="hidden" id="bailiff-id">
+    <label>القضية المرتبطة</label>
+    <select id="bailiff-case"></select>
+    <label>نوع الإجراء</label>
+    <select id="bailiff-type">
+      <option value="إعلان">إعلان قضائي</option>
+      <option value="إنذار">إنذار رسمي</option>
+      <option value="تنفيذ">محضر تنفيذ</option>
+      <option value="حجز">محضر حجز</option>
+      <option value="إثبات حالة">إثبات حالة</option>
+      <option value="أخرى">إجراء آخر</option>
+    </select>
+    <label>الجهة / الشخص المطلوب إعلانه</label>
+    <input type="text" id="bailiff-target" placeholder="الاسم والعنوان">
+    <label>تاريخ الإجراء</label>
+    <input type="date" id="bailiff-date">
+    <label>حالة الإجراء</label>
+    <select id="bailiff-status">
+      <option value="pending">قيد التنفيذ</option>
+      <option value="done">تم التنفيذ</option>
+      <option value="failed">لم يتم / يحتاج إعادة</option>
+    </select>
+    <label>ملاحظات</label>
+    <textarea id="bailiff-notes" rows="2" placeholder="تفاصيل الإجراء ونتيجته"></textarea>
+    <div class="modal-actions">
+      <button class="secondary" onclick="closeModal('modal-bailiff')">إلغاء</button>
+      <button onclick="saveBailiff()">حفظ</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Library (Law PDF) Modal ===== -->
+<div class="modal-bg" id="modal-library">
+  <div class="modal">
+    <h3 id="library-modal-title">إضافة قانون / تشريع</h3>
+    <input type="hidden" id="library-id">
+    <label>اسم القانون / التشريع</label>
+    <input type="text" id="library-name" placeholder="مثال: قانون العمل المصري">
+    <label>التصنيف</label>
+    <select id="library-category">
+      <option value="دستور">الدستور</option>
+      <option value="مدني">القانون المدني</option>
+      <option value="جنائي">القانون الجنائي</option>
+      <option value="تجاري">القانون التجاري</option>
+      <option value="عمل">قانون العمل</option>
+      <option value="أحوال شخصية">الأحوال الشخصية</option>
+      <option value="إجراءات">قوانين الإجراءات</option>
+      <option value="أخرى">أخرى</option>
+    </select>
+    <label>رابط ملف PDF</label>
+    <input type="url" id="library-url" placeholder="https://...">
+    <button class="secondary full" type="button" onclick="openBingSearch('library-url', (document.getElementById('library-name').value||'')+' قانون PDF')">🔎 البحث عن ملف PDF عبر Bing</button>
+    <label>أو رفع ملف PDF من الجهاز</label>
+    <input type="file" id="library-file" accept="application/pdf">
+    <label>ملاحظات</label>
+    <textarea id="library-notes" rows="2" placeholder="رقم القانون، تاريخ الإصدار، آخر تعديل..."></textarea>
+    <div class="modal-actions">
+      <button class="secondary" onclick="closeModal('modal-library')">إلغاء</button>
+      <button onclick="saveLibraryItem()">حفظ</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Directory Modal ===== -->
+<div class="modal-bg" id="modal-directory">
+  <div class="modal">
+    <h3 id="directory-modal-title">إضافة جهة</h3>
+    <input type="hidden" id="directory-id">
+    <input type="hidden" id="directory-category">
+    <label>الاسم</label>
+    <input type="text" id="directory-name" placeholder="مثال: محكمة شمال القاهرة">
+    <button class="secondary full" type="button" onclick="openBingSearchInfo(document.getElementById('directory-name').value)">🔎 البحث عن بيانات الجهة عبر Bing</button>
+    <label>المحافظة / المنطقة</label>
+    <input type="text" id="directory-area" placeholder="مثال: القاهرة">
+    <label>العنوان</label>
+    <input type="text" id="directory-address" placeholder="العنوان بالتفصيل">
+    <label>رقم التليفون</label>
+    <input type="text" id="directory-phone" placeholder="مثال: 0223456789">
+    <label>البريد الإلكتروني</label>
+    <input type="email" id="directory-email" placeholder="example@justice.gov.eg">
+    <label>ملاحظات</label>
+    <textarea id="directory-notes" rows="2" placeholder="ملاحظات إضافية (مواعيد العمل، تخصص الدوائر...)"></textarea>
+    <div class="modal-actions">
+      <button class="secondary" onclick="closeModal('modal-directory')">إلغاء</button>
+      <button onclick="saveDirectoryItem()">حفظ</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Portal Link Modal ===== -->
+<div class="modal-bg" id="modal-portal-link">
+  <div class="modal">
+    <h3 id="portal-link-title">رابط البوابة</h3>
+    <input type="hidden" id="portal-link-key">
+    <label>الصق رابط البوابة هنا</label>
+    <input type="url" id="portal-link-url" placeholder="https://...">
+    <button class="secondary full" type="button" onclick="openBingSearch('portal-link-url', document.getElementById('portal-link-title').textContent)">🔎 البحث عن الرابط عبر Bing</button>
+    <p style="font-size:11px;color:var(--text-dim);">سيتم تشغيل الرابط داخل التطبيق (Embed) دون فتح متصفح خارجي. ملاحظة: بعض المواقع الحكومية تمنع التضمين من جانبها (X-Frame-Options) فيظهر "صفحة غير متاحة" - وهذا قيد من الموقع نفسه ولا يمكن تجاوزه.</p>
+    <div class="modal-actions">
+      <button class="secondary" onclick="closeModal('modal-portal-link')">إلغاء</button>
+      <button onclick="savePortalLink()">حفظ وتشغيل</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Radio Link Modal ===== -->
+<div class="modal-bg" id="modal-radio-link">
+  <div class="modal">
+    <h3 id="radio-link-title">رابط المحطة</h3>
+    <input type="hidden" id="radio-link-key">
+    <label>اسم المحطة</label>
+    <input type="text" id="radio-link-name" placeholder="مثال: راديو القرآن الكريم">
+    <label>اكتب اسم المحطة، أو الصق رابطاً مباشراً</label>
+    <input type="text" id="radio-link-url" placeholder="مثال: اذاعة القرآن الكريم  أو  https://...">
+    <button class="secondary full" type="button" onclick="openBingSearch('radio-link-url', document.getElementById('radio-link-name').value)">🔎 بحث متقدم عن رابط مباشر عبر Bing (اختياري)</button>
+    <p style="font-size:11px;color:var(--text-dim);">
+      ✅ إذا كتبت اسم المحطة فقط (وليس رابطاً)، سيتم عرض نتائج بحث Bing مباشرة هنا داخل التطبيق - يمكنك التصفح والتشغيل من نفس المكان.<br>
+      ✅ إذا كان معك رابط مباشر (يوتيوب، ساوند كلاود، سبوتيفاي، Mixcloud، فيميو، أو رابط بث .mp3/.m3u8/.aac)، الصقه وسيتم تشغيله تلقائياً بدون بحث.
+    </p>
+    <div class="modal-actions">
+      <button class="secondary" onclick="closeModal('modal-radio-link')">إلغاء</button>
+      <button onclick="saveRadioLink()">حفظ وتشغيل</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script>
+// ============ STORAGE ============
+const DB = {
+  clients: JSON.parse(localStorage.getItem('lawyer_clients') || '[]'),
+  cases: JSON.parse(localStorage.getItem('lawyer_cases') || '[]'),
+  sessions: JSON.parse(localStorage.getItem('lawyer_sessions') || '[]'),
+  docs: JSON.parse(localStorage.getItem('lawyer_docs') || '[]'),
+  finance: JSON.parse(localStorage.getItem('lawyer_finance') || '[]'),
+  bailiff: JSON.parse(localStorage.getItem('lawyer_bailiff') || '[]'),
+  executions: JSON.parse(localStorage.getItem('lawyer_executions') || '[]'),
+  library: JSON.parse(localStorage.getItem('lawyer_library') || '[]'),
+  directory: JSON.parse(localStorage.getItem('lawyer_directory') || '[]'),
+  portalLinks: JSON.parse(localStorage.getItem('lawyer_portal_links') || '{}'),
+  radioLinks: JSON.parse(localStorage.getItem('lawyer_radio_links') || '{}'),
+};
+function save(key){ localStorage.setItem('lawyer_'+key, JSON.stringify(DB[key])); }
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),1800);
+}
+function escapeHtml(str){
+  if(str==null) return '';
+  return String(str).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+function getClientName(clientId){
+  const c = DB.clients.find(x=>x.id===clientId);
+  return c ? c.name : '';
+}
+
+// ============ GLOBAL ERROR HANDLING ============
+// Prevents cryptic "[object Object]" alerts: logs full details to console
+// and shows a short readable toast instead. Does not stop app execution.
+function describeError(e){
+  if(e instanceof Error) return e.message;
+  if(e && typeof e === 'object'){
+    try{ return JSON.stringify(e); }catch(_){ return Object.prototype.toString.call(e); }
+  }
+  return String(e);
+}
+window.addEventListener('error', function(ev){
+  console.error('Global error:', ev.error || ev.message, ev);
+});
+window.addEventListener('unhandledrejection', function(ev){
+  console.error('Unhandled promise rejection:', describeError(ev.reason), ev.reason);
+  ev.preventDefault();
+});
+
+// ============ LOCAL DATA STORE (chat / notifications / team) ============
+// Replaces the previous Supabase cloud sync. Everything is stored on-device
+// via localStorage, keeping the same function names used elsewhere in the
+// app so no other code needed to change.
+DB.chatMessages = JSON.parse(localStorage.getItem('lawyer_chat_messages') || '[]');     // [{id, clientId, sender, text, createdAt}]
+DB.notifications = JSON.parse(localStorage.getItem('lawyer_notifications') || '[]');    // [{id, text, due_at, created_at}]
+DB.team = JSON.parse(localStorage.getItem('lawyer_team') || '[]');                      // [{id, name, email, role, perms, createdAt}]
+DB.teamChat = JSON.parse(localStorage.getItem('lawyer_team_chat') || '[]');             // [{id, authorId, authorName, text, createdAt}]
+
+function connStatusUpdate(ok){
+  const dot = document.getElementById('cloud-status');
+  if(dot) dot.textContent = ok ? '🟢 التخزين المحلي يعمل' : '🔴 وضع محلي فقط';
+}
+
+// ---- Chat with clients (local) ----
+async function cloudLoadChat(clientId){
+  return DB.chatMessages
+    .filter(m=>m.clientId===clientId)
+    .sort((a,b)=>a.createdAt-b.createdAt)
+    .map(m=>({from:m.sender, text:m.text, time:m.createdAt}));
+}
+async function cloudSendChat(clientId, text){
+  DB.chatMessages.push({id:uid(), clientId, sender:'lawyer', text, createdAt:Date.now()});
+  save('chatMessages');
+  return true;
+}
+// No realtime needed for local storage - this is now a harmless no-op kept
+// for compatibility with existing call sites.
+function subscribeChatRealtime(clientId, onNewMsg){ /* not needed for local storage */ }
+
+// ---- Notifications (local) ----
+async function cloudLoadNotifications(){
+  return [...DB.notifications].sort((a,b)=>b.created_at-a.created_at).slice(0,50);
+}
+async function cloudPushNotification(text, dueAt){
+  DB.notifications.unshift({id:uid(), text, due_at: dueAt || null, created_at: Date.now()});
+  save('notifications');
+  return true;
+}
+function subscribeNotificationsRealtime(onNew){ /* not needed for local storage */ }
+
+// ---- Team (local) ----
+async function cloudLoadTeam(){
+  return DB.team.map(m=>({...m}));
+}
+async function cloudSaveTeamMember(m){
+  const existing = DB.team.find(x=>x.id===m.id);
+  if(existing){ Object.assign(existing, m); }
+  else { DB.team.push({...m}); }
+  save('team');
+  return true;
+}
+async function cloudDeleteTeamMember(id){
+  DB.team = DB.team.filter(x=>x.id!==id);
+  save('team');
+  return true;
+}
+
+// ---- Internal team chat (local, single shared office channel) ----
+function postTeamChatMessage(authorName, text){
+  DB.teamChat.push({id:uid(), authorName, text, createdAt:Date.now()});
+  save('teamChat');
+}
+function loadTeamChat(){
+  return [...DB.teamChat].sort((a,b)=>a.createdAt-b.createdAt);
+}
+
+
+// ============ NAVIGATION ============
+// Map of page name -> render function NAME (resolved at call time, since
+// the actual function declarations live in later <script> blocks and are
+// not yet available when this object would otherwise be constructed).
+const PAGE_RENDERERS = {
+  home: 'renderHome',
+  clients: 'renderClients',
+  cases: 'renderCases',
+  sessions: 'renderSessions',
+  docs: 'renderDocs',
+  ai: 'renderAIChat',
+  notif: 'renderNotif',
+  team: 'renderTeam',
+  finance: 'renderFinance',
+  execution: 'renderExecution',
+  bailiff: 'renderBailiff',
+  library: 'renderLibrary',
+  forms: 'renderForms',
+  directory: 'renderDirectory',
+  portals: 'renderPortals',
+  radio: 'renderRadio',
+};
+function callPageRenderer(name){
+  const fnName = PAGE_RENDERERS[name];
+  if(fnName && typeof window[fnName] === 'function'){
+    try{
+      window[fnName]();
+    }catch(e){
+      console.error('Error rendering page', name, e);
+    }
+  }
+}
+
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+  if(event && event.currentTarget && event.currentTarget.tagName==='BUTTON') event.currentTarget.classList.add('active');
+  callPageRenderer(name);
+}
+function showPageDirect(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+  // try to highlight matching nav button by onclick signature
+  document.querySelectorAll('nav button').forEach(b=>{
+    if(b.getAttribute('onclick') === `showPage('${name}')`) b.classList.add('active');
+  });
+  callPageRenderer(name);
+}
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+</script>
+<script>
+// ============ CLIENTS ============
+function openClientModal(id){
+  document.getElementById('client-id').value = id || '';
+  if(id){
+    const c = DB.clients.find(x=>x.id===id);
+    document.getElementById('client-modal-title').textContent='تعديل بيانات الموكل';
+    document.getElementById('client-type').value = c.type;
+    document.getElementById('client-name').value = c.name;
+    document.getElementById('client-phone').value = c.phone;
+    document.getElementById('client-national').value = c.national;
+    document.getElementById('client-address').value = c.address;
+    document.getElementById('client-notes').value = c.notes;
+  } else {
+    document.getElementById('client-modal-title').textContent='إضافة موكل جديد';
+    ['client-name','client-phone','client-national','client-address','client-notes'].forEach(f=>document.getElementById(f).value='');
+    document.getElementById('client-type').value='فرد';
+  }
+  document.getElementById('modal-client').classList.add('open');
+}
+function saveClient(){
+  const id = document.getElementById('client-id').value;
+  const name = document.getElementById('client-name').value.trim();
+  if(!name){ toast('من فضلك أدخل اسم الموكل'); return; }
+  const data = {
+    type: document.getElementById('client-type').value,
+    name,
+    phone: document.getElementById('client-phone').value.trim(),
+    national: document.getElementById('client-national').value.trim(),
+    address: document.getElementById('client-address').value.trim(),
+    notes: document.getElementById('client-notes').value.trim(),
+  };
+  if(id){
+    const c = DB.clients.find(x=>x.id===id);
+    Object.assign(c,data);
+    toast('تم تعديل بيانات الموكل');
+  } else {
+    DB.clients.push({id:uid(),...data,createdAt:Date.now()});
+    toast('تم إضافة الموكل بنجاح');
+  }
+  save('clients');
+  closeModal('modal-client');
+  renderClients();
+  renderHome();
+}
+function deleteClient(id){
+  if(!confirm('هل تريد حذف هذا الموكل؟ سيتم الاحتفاظ بالقضايا المرتبطة به.')) return;
+  DB.clients = DB.clients.filter(x=>x.id!==id);
+  save('clients');
+  renderClients();
+  renderHome();
+}
+function renderClients(){
+  const q = (document.getElementById('client-search')?.value || '').trim().toLowerCase();
+  const list = document.getElementById('clients-list');
+  let items = DB.clients;
+  if(q){
+    items = items.filter(c=>
+      c.name.toLowerCase().includes(q) ||
+      (c.phone||'').includes(q) ||
+      (c.national||'').includes(q)
+    );
+  }
+  if(items.length===0){
+    list.innerHTML = `<div class="empty"><span class="icon">👤</span>لا يوجد موكلين${q?' مطابقين للبحث':''}.<br>اضغط "إضافة موكل جديد" للبدء.</div>`;
+    return;
+  }
+  list.innerHTML = items.map(c=>{
+    const caseCount = DB.cases.filter(cs=>cs.clientId===c.id).length;
+    return `<div class="item">
+      <div class="info" onclick="openClientChat('${c.id}')" style="cursor:pointer;">
+        <b>${escapeHtml(c.name)}</b>
+        <div class="meta">${c.type} ${c.phone?'· '+escapeHtml(c.phone):''} ${c.national?'· '+escapeHtml(c.national):''}</div>
+        <div class="meta">عدد القضايا: ${caseCount} · 💬 اضغط للدردشة</div>
+      </div>
+      <div class="actions">
+        <button class="secondary" onclick="openClientModal('${c.id}')">تعديل</button>
+        <button class="danger" onclick="deleteClient('${c.id}')">حذف</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+document.getElementById('client-search').addEventListener('input', renderClients);
+
+// ============ CASES ============
+function fillClientSelect(){
+  const sel = document.getElementById('case-client');
+  sel.innerHTML = '<option value="">— اختر الموكل —</option>' +
+    DB.clients.map(c=>`<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
+}
+function openCaseModal(id){
+  fillClientSelect();
+  document.getElementById('case-id').value = id || '';
+  if(id){
+    const c = DB.cases.find(x=>x.id===id);
+    document.getElementById('case-modal-title').textContent='تعديل القضية';
+    document.getElementById('case-number').value = c.number;
+    document.getElementById('case-client').value = c.clientId;
+    document.getElementById('case-type').value = c.type;
+    document.getElementById('case-court').value = c.court;
+    document.getElementById('case-opponent').value = c.opponent;
+    document.getElementById('case-opponent-lawyer').value = c.opponentLawyer;
+    document.getElementById('case-status').value = c.status;
+    document.getElementById('case-fee-total').value = c.feeTotal || '';
+    document.getElementById('case-fee-paid').value = c.feePaid || '';
+    document.getElementById('case-notes').value = c.notes;
+  } else {
+    document.getElementById('case-modal-title').textContent='إضافة قضية جديدة';
+    ['case-number','case-type','case-court','case-opponent','case-opponent-lawyer','case-notes','case-fee-total','case-fee-paid'].forEach(f=>document.getElementById(f).value='');
+    document.getElementById('case-status').value='active';
+  }
+  document.getElementById('modal-case').classList.add('open');
+}
+function saveCase(){
+  const id = document.getElementById('case-id').value;
+  const number = document.getElementById('case-number').value.trim();
+  if(!number){ toast('من فضلك أدخل رقم القضية'); return; }
+  const data = {
+    number,
+    clientId: document.getElementById('case-client').value,
+    type: document.getElementById('case-type').value.trim(),
+    court: document.getElementById('case-court').value.trim(),
+    opponent: document.getElementById('case-opponent').value.trim(),
+    opponentLawyer: document.getElementById('case-opponent-lawyer').value.trim(),
+    status: document.getElementById('case-status').value,
+    feeTotal: parseFloat(document.getElementById('case-fee-total').value) || 0,
+    feePaid: parseFloat(document.getElementById('case-fee-paid').value) || 0,
+    notes: document.getElementById('case-notes').value.trim(),
+  };
+  if(id){
+    const c = DB.cases.find(x=>x.id===id);
+    Object.assign(c,data);
+    toast('تم تعديل القضية');
+  } else {
+    DB.cases.push({id:uid(),...data,createdAt:Date.now()});
+    toast('تم إضافة القضية بنجاح');
+  }
+  save('cases');
+  closeModal('modal-case');
+  renderCases();
+  renderHome();
+}
+function deleteCase(id){
+  if(!confirm('هل تريد حذف هذه القضية؟ سيتم حذف الجلسات والمستندات والحركات المالية وإجراءات المحضرين المرتبطة بها.')) return;
+  DB.cases = DB.cases.filter(x=>x.id!==id);
+  DB.sessions = DB.sessions.filter(x=>x.caseId!==id);
+  DB.docs = DB.docs.filter(x=>x.caseId!==id);
+  DB.finance = DB.finance.filter(x=>x.caseId!==id);
+  DB.bailiff = DB.bailiff.filter(x=>x.caseId!==id);
+  DB.executions = DB.executions.filter(x=>x.caseId!==id);
+  save('cases'); save('sessions'); save('docs'); save('finance'); save('bailiff'); save('executions');
+  renderCases();
+  renderHome();
+}
+const statusLabel = {active:'منظورة', pending:'معلقة', closed:'منتهية'};
+const statusClass = {active:'active', pending:'pending', closed:'closed'};
+function renderCases(){
+  const q = (document.getElementById('case-search')?.value || '').trim().toLowerCase();
+  const list = document.getElementById('cases-list');
+  let items = DB.cases;
+  if(q){
+    items = items.filter(c=>
+      c.number.toLowerCase().includes(q) ||
+      (c.type||'').toLowerCase().includes(q) ||
+      (c.opponent||'').toLowerCase().includes(q) ||
+      (getClientName(c.clientId)||'').toLowerCase().includes(q)
+    );
+  }
+  if(items.length===0){
+    list.innerHTML = `<div class="empty"><span class="icon">⚖️</span>لا توجد قضايا${q?' مطابقة للبحث':''}.<br>اضغط "إضافة قضية جديدة" للبدء.</div>`;
+    return;
+  }
+  list.innerHTML = items.map(c=>{
+    const sessCount = DB.sessions.filter(s=>s.caseId===c.id).length;
+    const docCount = DB.docs.filter(d=>d.caseId===c.id).length;
+    const balance = (c.feeTotal||0) - (c.feePaid||0);
+    return `<div class="item" onclick="if(event.target.tagName!=='BUTTON')showCaseDetail('${c.id}')" style="cursor:pointer;">
+      <div class="info">
+        <b>${escapeHtml(c.number)}</b> <span class="badge ${statusClass[c.status]}">${statusLabel[c.status]}</span>
+        <div class="meta">${escapeHtml(getClientName(c.clientId)||'بدون موكل')} ${c.type?'· '+escapeHtml(c.type):''}</div>
+        <div class="meta">${c.court?'المحكمة: '+escapeHtml(c.court):''}</div>
+        <div class="meta">جلسات: ${sessCount} · مستندات: ${docCount}${c.feeTotal?' · المتبقي: '+balance+' ج.م':''}</div>
+      </div>
+      <div class="actions">
+        <button class="secondary" onclick="openCaseModal('${c.id}')">تعديل</button>
+        <button class="danger" onclick="deleteCase('${c.id}')">حذف</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+document.getElementById('case-search').addEventListener('input', renderCases);
+
+function showCaseDetail(caseId){
+  const c = DB.cases.find(x=>x.id===caseId);
+  if(!c) return;
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-case-detail').classList.add('active');
+  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+
+  const client = DB.clients.find(x=>x.id===c.clientId);
+  const sessions = DB.sessions.filter(s=>s.caseId===caseId).sort((a,b)=>new Date(a.date)-new Date(b.date));
+  const docs = DB.docs.filter(d=>d.caseId===caseId);
+  const finRows = DB.finance.filter(f=>f.caseId===caseId);
+  const bailiffRows = DB.bailiff.filter(b=>b.caseId===caseId);
+  const exec = DB.executions.find(e=>e.caseId===caseId);
+  const balance = (c.feeTotal||0)-(c.feePaid||0);
+  currentShareCaseId = caseId; // used by getCaseShareContent()
+
+  const el = document.getElementById('case-detail-content');
+  el.innerHTML = `
+    <div class="card">
+      <h3>⚖️ ${escapeHtml(c.number)} <span class="badge ${statusClass[c.status]}">${statusLabel[c.status]}</span></h3>
+      <div class="meta" style="margin-bottom:6px;">الموكل: <b style="color:var(--gold-light)">${escapeHtml(client?client.name:'بدون موكل')}</b></div>
+      ${c.type?`<div class="meta">النوع: ${escapeHtml(c.type)}</div>`:''}
+      ${c.court?`<div class="meta">المحكمة: ${escapeHtml(c.court)}</div>`:''}
+      ${c.opponent?`<div class="meta">الخصم: ${escapeHtml(c.opponent)}${c.opponentLawyer?' (محاميه: '+escapeHtml(c.opponentLawyer)+')':''}</div>`:''}
+      ${c.notes?`<div class="meta" style="margin-top:6px;white-space:pre-wrap;">${escapeHtml(c.notes)}</div>`:''}
+      ${shareToolbarHtml('getCaseShareContent')}
+    </div>
+
+    <div class="card">
+      <h3>🧭 مسار القضية</h3>
+      ${renderCaseTimeline(c, sessions, finRows, bailiffRows, exec)}
+    </div>
+
+    <div class="card">
+      <h3>💰 الوضع المالي</h3>
+      <div class="fin-summary">
+        <div class="box income"><div class="v">${c.feeTotal||0}</div><div class="l">الأتعاب المتفق عليها</div></div>
+        <div class="box balance"><div class="v">${c.feePaid||0}</div><div class="l">المدفوع</div></div>
+        <div class="box expense"><div class="v">${balance}</div><div class="l">المتبقي</div></div>
+      </div>
+      ${finRows.length? `<div class="meta">عدد الحركات المسجلة لهذه القضية: ${finRows.length}</div>` : ''}
+      <button class="secondary full" style="margin-top:8px;" onclick="showPageDirect('finance')">عرض كل الحركات المالية</button>
+    </div>
+
+    <div class="card">
+      <h3>📅 الجلسات (${sessions.length})</h3>
+      ${sessions.length===0? `<div class="meta">لا توجد جلسات مسجلة لهذه القضية.</div>` :
+        sessions.map(s=>`<div class="item"><div class="info">
+          <b>${escapeHtml(s.type)}</b> ${s.result?`<span class="badge ${SESSION_RESULT_BADGE_CLASS[s.result]||'info'}">${escapeHtml(s.result)}</span>`:''}
+          <div class="meta">${formatDateTime(s.date)}</div>
+          ${s.resultNotes?`<div class="meta">📌 ${escapeHtml(s.resultNotes)}</div>`:''}
+          ${s.notes?`<div class="meta">${escapeHtml(s.notes)}</div>`:''}
+        </div></div>`).join('')}
+    </div>
+
+    <div class="card">
+      <h3>📄 المستندات (${docs.length})</h3>
+      ${docs.length===0? `<div class="meta">لا توجد مستندات مرتبطة.</div>` :
+        docs.map(d=>`<div class="item"><div class="info">
+          <b>${escapeHtml(d.name)}</b>
+          <div class="meta">${escapeHtml(d.type||'')}</div>
+          ${d.notes?`<div class="meta">${escapeHtml(d.notes)}</div>`:''}
+        </div></div>`).join('')}
+    </div>
+
+    <div class="card">
+      <h3>🏛️ تنفيذ الحكم</h3>
+      ${exec ? `<div class="meta">نوع التنفيذ: ${exec.type==='civil'?'مدني':'جنائي'}</div>
+        <div class="meta">المرحلة الحالية: ${escapeHtml(getExecutionSteps(exec.type)[exec.currentStep]?.title || '—')}</div>` :
+        `<div class="meta">لم يبدأ تتبع تنفيذ الحكم لهذه القضية بعد.</div>`}
+      <button class="secondary full" style="margin-top:8px;" onclick="goToExecutionForCase('${c.id}')">فتح متابعة التنفيذ</button>
+    </div>
+
+    <div class="card">
+      <h3>📜 إجراءات المحضرين (${bailiffRows.length})</h3>
+      ${bailiffRows.length===0? `<div class="meta">لا توجد إجراءات محضرين مسجلة.</div>` :
+        bailiffRows.map(b=>`<div class="item"><div class="info">
+          <b>${escapeHtml(b.type)}</b> <span class="badge ${b.status==='done'?'active':b.status==='failed'?'closed':'pending'}">${bailiffStatusLabel[b.status]}</span>
+          <div class="meta">${escapeHtml(b.target)} · ${b.date||''}</div>
+        </div></div>`).join('')}
+      <button class="secondary full" style="margin-top:8px;" onclick="showPageDirect('bailiff')">عرض كل إجراءات المحضرين</button>
+    </div>
+  `;
+}
+function formatDateTime(dt){
+  if(!dt) return '';
+  const d = new Date(dt);
+  if(isNaN(d.getTime())) return dt;
+  return d.toLocaleString('ar-EG', {dateStyle:'medium', timeStyle:'short'});
+}
+
+// ---- Unified case timeline ("مسار القضية") ----
+const SESSION_RESULT_BADGE_CLASS = {'تأجلت':'pending','حضور':'info','مرافعة':'info','صدر حكم':'active','شطب':'closed','أخرى':'info'};
+const SESSION_RESULT_ICON = {'تأجلت':'⏳','حضور':'✅','مرافعة':'🗣️','صدر حكم':'⚖️','شطب':'🗑️','أخرى':'📝'};
+// Builds a single chronological timeline combining: case creation, every
+// session (with its result/decision), every financial movement, every
+// bailiff action, and execution-of-judgment progress. This gives a single
+// view of the case's full path from opening to closing.
+// ---- Share content provider for case detail page ----
+let currentShareCaseId = null;
+function getCaseShareContent(){
+  const c = DB.cases.find(x=>x.id===currentShareCaseId);
+  if(!c) return null;
+  const client = DB.clients.find(x=>x.id===c.clientId);
+  const sessions = DB.sessions.filter(s=>s.caseId===c.id).sort((a,b)=>new Date(a.date)-new Date(b.date));
+  const finRows = DB.finance.filter(f=>f.caseId===c.id);
+  const bailiffRows = DB.bailiff.filter(b=>b.caseId===c.id);
+  const exec = DB.executions.find(e=>e.caseId===c.id);
+  const balance = (c.feeTotal||0)-(c.feePaid||0);
+
+  const lines = [];
+  lines.push(`القضية رقم: ${c.number} (${statusLabel[c.status]})`);
+  lines.push(`الموكل: ${client?client.name:'بدون موكل'}`);
+  if(c.type) lines.push(`النوع: ${c.type}`);
+  if(c.court) lines.push(`المحكمة: ${c.court}`);
+  if(c.opponent) lines.push(`الخصم: ${c.opponent}`);
+  lines.push('');
+  lines.push('-- الوضع المالي --');
+  lines.push(`الأتعاب: ${c.feeTotal||0} ج.م / المدفوع: ${c.feePaid||0} ج.م / المتبقي: ${balance} ج.م`);
+  lines.push('');
+  lines.push('-- مسار القضية --');
+  if(sessions.length===0) lines.push('لا توجد جلسات مسجلة.');
+  sessions.forEach(s=>{
+    let line = `${formatDateTime(s.date)} - ${s.type}`;
+    if(s.result) line += ` (${s.result})`;
+    if(s.resultNotes) line += `: ${s.resultNotes}`;
+    lines.push(line);
+  });
+  if(exec){
+    const steps = getExecutionSteps(exec.type);
+    lines.push(`تنفيذ الحكم (${exec.type==='civil'?'مدني':'جنائي'}): ${steps[exec.currentStep]?.title||''} (${exec.currentStep+1}/${steps.length})`);
+  }
+  if(bailiffRows.length){
+    lines.push('');
+    lines.push('-- إجراءات المحضرين --');
+    bailiffRows.forEach(b=> lines.push(`${b.date||''} - ${b.type} - ${b.target} (${bailiffStatusLabel[b.status]})`));
+  }
+
+  const text = lines.join('\n');
+  const html = `<div style="white-space:pre-wrap;line-height:1.9;">${escapeHtml(text)}</div>`;
+  return {title:`ملخص القضية ${c.number}`, html, text};
+}
+
+function renderCaseTimeline(c, sessions, finRows, bailiffRows, exec){
+  const events = [];
+  events.push({time:c.createdAt||0, icon:'🆕', title:'فتح القضية', detail:c.type?`نوع القضية: ${c.type}`:''});
+
+  sessions.forEach(s=>{
+    let title = escapeHtml(s.type);
+    if(s.result) title += ` — ${SESSION_RESULT_ICON[s.result]||''} ${escapeHtml(s.result)}`;
+    let detail = '';
+    if(s.resultNotes) detail += escapeHtml(s.resultNotes);
+    if(s.notes) detail += (detail?' · ':'') + escapeHtml(s.notes);
+    events.push({time:new Date(s.date).getTime()||0, icon:'📅', title, detail});
+  });
+
+  finRows.forEach(f=>{
+    const title = (f.kind==='income'?'💰 إيراد: ':'🧾 مصروف: ')+escapeHtml(f.desc);
+    events.push({time:f.createdAt||new Date(f.date).getTime()||0, icon: f.kind==='income'?'💰':'🧾', title:escapeHtml(f.desc)+` (${f.amount.toLocaleString('ar-EG')} ج.م)`, detail: f.kind==='income'?'إيراد':'مصروف'});
+  });
+
+  bailiffRows.forEach(b=>{
+    events.push({time:b.createdAt||new Date(b.date).getTime()||0, icon:'📜', title:`${escapeHtml(b.type)} - ${escapeHtml(b.target)}`, detail:bailiffStatusLabel[b.status]||''});
+  });
+
+  if(exec){
+    const steps = getExecutionSteps(exec.type);
+    events.push({time:exec.createdAt||0, icon:'🏛️', title:`بدء تتبع تنفيذ الحكم (${exec.type==='civil'?'مدني':'جنائي'})`, detail:''});
+    if(exec.currentStep>0){
+      events.push({time:(exec.createdAt||0)+1, icon:'🏛️', title:`المرحلة الحالية: ${escapeHtml(steps[exec.currentStep]?.title||'')}`, detail:`(${exec.currentStep+1} من ${steps.length})`});
+    }
+  }
+
+  if(c.status==='closed'){
+    events.push({time:Date.now(), icon:'🔒', title:'إغلاق القضية / منتهية', detail:''});
+  }
+
+  events.sort((a,b)=>a.time-b.time);
+
+  if(events.length===0){
+    return `<div class="meta">لا توجد أحداث مسجلة لهذه القضية بعد.</div>`;
+  }
+  return `<div class="progress-track">` + events.map((e,i)=>{
+    const isLast = i===events.length-1;
+    const cls = isLast ? 'current' : 'done';
+    return `<div class="progress-step ${cls}">
+      <div class="dot">${e.icon}</div>
+      <div class="step-content">
+        <div class="step-title">${e.title}</div>
+        ${e.time?`<div class="step-date">${formatDateTime(new Date(e.time).toISOString())}</div>`:''}
+        ${e.detail?`<div class="step-notes">${e.detail}</div>`:''}
+      </div>
+    </div>`;
+  }).join('') + `</div>`;
+}
+</script>
+<script>
+// ============ SESSIONS ============
+function fillCaseSelect(selectId){
+  const sel = document.getElementById(selectId);
+  sel.innerHTML = '<option value="">— اختر القضية —</option>' +
+    DB.cases.map(c=>`<option value="${c.id}">${escapeHtml(c.number)} - ${escapeHtml(getClientName(c.clientId)||'بدون موكل')}</option>`).join('');
+}
+function openSessionModal(id){
+  fillCaseSelect('session-case');
+  document.getElementById('session-id').value = id || '';
+  if(id){
+    const s = DB.sessions.find(x=>x.id===id);
+    document.getElementById('session-modal-title').textContent='تعديل الجلسة';
+    document.getElementById('session-case').value = s.caseId;
+    document.getElementById('session-type').value = s.type;
+    document.getElementById('session-date').value = s.date;
+    document.getElementById('session-result').value = s.result || '';
+    document.getElementById('session-result-notes').value = s.resultNotes || '';
+    document.getElementById('session-notes').value = s.notes;
+  } else {
+    document.getElementById('session-modal-title').textContent='إضافة جلسة جديدة';
+    document.getElementById('session-date').value='';
+    document.getElementById('session-notes').value='';
+    document.getElementById('session-result').value='';
+    document.getElementById('session-result-notes').value='';
+    document.getElementById('session-type').value='جلسة محكمة';
+  }
+  document.getElementById('modal-session').classList.add('open');
+}
+function saveSession(){
+  const id = document.getElementById('session-id').value;
+  const caseId = document.getElementById('session-case').value;
+  const date = document.getElementById('session-date').value;
+  if(!caseId){ toast('من فضلك اختر القضية'); return; }
+  if(!date){ toast('من فضلك أدخل تاريخ ووقت الجلسة'); return; }
+  const data = {
+    caseId, date,
+    type: document.getElementById('session-type').value,
+    result: document.getElementById('session-result').value,
+    resultNotes: document.getElementById('session-result-notes').value.trim(),
+    notes: document.getElementById('session-notes').value.trim(),
+  };
+  let sessionObj;
+  if(id){
+    sessionObj = DB.sessions.find(x=>x.id===id);
+    Object.assign(sessionObj,data);
+    toast('تم تعديل الجلسة');
+  } else {
+    sessionObj = {id:uid(),...data,createdAt:Date.now()};
+    DB.sessions.push(sessionObj);
+    toast('تم إضافة الجلسة بنجاح');
+  }
+  save('sessions');
+  closeModal('modal-session');
+  renderSessions();
+  renderHome();
+  // Auto-link: a session result that represents a final ruling can update
+  // the case status and surface in the case's unified timeline.
+  applySessionResultToCase(sessionObj);
+}
+// ---- Automatic linkage: session result -> case status / timeline ----
+function applySessionResultToCase(sessionObj){
+  if(!sessionObj || !sessionObj.caseId) return;
+  const c = DB.cases.find(x=>x.id===sessionObj.caseId);
+  if(!c) return;
+  if(sessionObj.result === 'صدر حكم' && c.status !== 'closed'){
+    c.status = 'closed';
+    save('cases');
+    toast('📌 تم تحديث حالة القضية إلى "منتهية" بناءً على صدور الحكم');
+    renderCases();
+    renderHome();
+  }
+}
+function deleteSession(id){
+  if(!confirm('هل تريد حذف هذه الجلسة؟')) return;
+  DB.sessions = DB.sessions.filter(x=>x.id!==id);
+  save('sessions');
+  renderSessions();
+  renderHome();
+}
+function renderSessions(){
+  const list = document.getElementById('sessions-list');
+  const items = [...DB.sessions].sort((a,b)=>new Date(a.date)-new Date(b.date));
+  if(items.length===0){
+    list.innerHTML = `<div class="empty"><span class="icon">📅</span>لا توجد جلسات مسجلة.<br>اضغط "إضافة جلسة جديدة" للبدء.</div>`;
+    return;
+  }
+  const now = new Date();
+  const RESULT_BADGE_CLASS = {'تأجلت':'pending','حضور':'info','مرافعة':'info','صدر حكم':'active','شطب':'closed','أخرى':'info'};
+  list.innerHTML = items.map(s=>{
+    const c = DB.cases.find(x=>x.id===s.caseId);
+    const isPast = new Date(s.date) < now;
+    return `<div class="item">
+      <div class="info">
+        <b>${escapeHtml(s.type)}</b> ${isPast?'<span class="badge closed">منتهية</span>':'<span class="badge active">قادمة</span>'}
+        ${s.result?`<span class="badge ${RESULT_BADGE_CLASS[s.result]||'info'}">${escapeHtml(s.result)}</span>`:''}
+        <div class="meta">📁 ${escapeHtml(c?c.number:'—')} · ${escapeHtml(getClientName(c?.clientId)||'')}</div>
+        <div class="meta">🕐 ${formatDateTime(s.date)}</div>
+        ${s.resultNotes?`<div class="meta">📌 ${escapeHtml(s.resultNotes)}</div>`:''}
+        ${s.notes?`<div class="meta">${escapeHtml(s.notes)}</div>`:''}
+      </div>
+      <div class="actions">
+        <button class="secondary" onclick="openSessionModal('${s.id}')">تعديل</button>
+        <button class="danger" onclick="deleteSession('${s.id}')">حذف</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ============ DOCUMENTS ============
+function openDocModal(id){
+  fillCaseSelect('doc-case');
+  document.getElementById('doc-id').value = id || '';
+  if(id){
+    const d = DB.docs.find(x=>x.id===id);
+    document.getElementById('doc-case').value = d.caseId;
+    document.getElementById('doc-name').value = d.name;
+    document.getElementById('doc-type').value = d.type;
+    document.getElementById('doc-notes').value = d.notes;
+  } else {
+    ['doc-name','doc-type','doc-notes'].forEach(f=>document.getElementById(f).value='');
+  }
+  document.getElementById('modal-doc').classList.add('open');
+}
+function saveDoc(){
+  const id = document.getElementById('doc-id').value;
+  const name = document.getElementById('doc-name').value.trim();
+  if(!name){ toast('من فضلك أدخل اسم المستند'); return; }
+  const data = {
+    caseId: document.getElementById('doc-case').value,
+    name,
+    type: document.getElementById('doc-type').value.trim(),
+    notes: document.getElementById('doc-notes').value.trim(),
+  };
+  if(id){
+    const d = DB.docs.find(x=>x.id===id);
+    Object.assign(d,data);
+    toast('تم تعديل المستند');
+  } else {
+    DB.docs.push({id:uid(),...data,createdAt:Date.now()});
+    toast('تم إضافة المستند');
+  }
+  save('docs');
+  closeModal('modal-doc');
+  renderDocs();
+}
+function deleteDoc(id){
+  if(!confirm('هل تريد حذف هذا المستند؟')) return;
+  DB.docs = DB.docs.filter(x=>x.id!==id);
+  save('docs');
+  renderDocs();
+}
+function renderDocs(){
+  const list = document.getElementById('docs-list');
+  if(DB.docs.length===0){
+    list.innerHTML = `<div class="empty"><span class="icon">📄</span>لا توجد مستندات.<br>اضغط "إضافة مستند" للبدء.</div>`;
+    return;
+  }
+  list.innerHTML = DB.docs.map(d=>{
+    const c = DB.cases.find(x=>x.id===d.caseId);
+    return `<div class="item">
+      <div class="info">
+        <b>${escapeHtml(d.name)}</b>
+        <div class="meta">${escapeHtml(d.type||'')}</div>
+        <div class="meta">📁 ${escapeHtml(c?c.number:'غير مرتبط بقضية')}</div>
+        ${d.notes?`<div class="meta">${escapeHtml(d.notes)}</div>`:''}
+      </div>
+      <div class="actions">
+        <button class="secondary" onclick="openDocModal('${d.id}')">تعديل</button>
+        <button class="danger" onclick="deleteDoc('${d.id}')">حذف</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ============ CLIENT CHAT ============
+let currentChatClientId = null;
+async function openClientChat(clientId){
+  currentChatClientId = clientId;
+  const c = DB.clients.find(x=>x.id===clientId);
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-chat').classList.add('active');
+  document.getElementById('chat-client-name').textContent = '💬 محادثة مع ' + (c?c.name:'');
+  const msgs = await cloudLoadChat(clientId);
+  renderChatMessages(msgs);
+  subscribeChatRealtime(clientId, (m)=>{
+    if(currentChatClientId===clientId){
+      const box = document.getElementById('chat-messages');
+      box.innerHTML += chatBubble(m);
+      box.scrollTop = box.scrollHeight;
+    }
+  });
+}
+function chatBubble(m){
+  const mine = m.from==='lawyer';
+  return `<div style="display:flex;justify-content:${mine?'flex-end':'flex-start'};margin-bottom:6px;">
+    <div style="max-width:75%;padding:8px 12px;border-radius:10px;font-size:13px;
+      background:${mine?'linear-gradient(135deg,var(--gold-light),var(--gold))':'#0e0c09'};
+      color:${mine?'#1a1408':'var(--text)'};border:${mine?'none':'1px solid var(--border)'};">
+      ${escapeHtml(m.text)}
+    </div>
+  </div>`;
+}
+function renderChatMessages(msgs){
+  const box = document.getElementById('chat-messages');
+  if(msgs.length===0){
+    box.innerHTML = `<div class="empty"><span class="icon">💬</span>لا توجد رسائل حتى الآن.</div>`;
+    return;
+  }
+  box.innerHTML = msgs.map(chatBubble).join('');
+  box.scrollTop = box.scrollHeight;
+}
+async function sendChatMsg(){
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if(!text || !currentChatClientId) return;
+  const ok = await cloudSendChat(currentChatClientId, text);
+  if(ok){
+    input.value='';
+    const box = document.getElementById('chat-messages');
+    if(box.querySelector('.empty')) box.innerHTML='';
+    box.innerHTML += chatBubble({from:'lawyer', text});
+    box.scrollTop = box.scrollHeight;
+  } else {
+    toast('فشل إرسال الرسالة - تحقق من الاتصال');
+  }
+}
+
+// ============ AI ASSISTANT ============
+let aiHistory = [];
+function renderAIChat(){
+  const box = document.getElementById('ai-messages');
+  if(aiHistory.length===0){
+    box.innerHTML = `<div class="empty"><span class="icon">🤖</span>اسأل المساعد القانوني عن أي استفسار عام، أو استخدم البحث القانوني بالإنترنت.</div>`;
+    return;
+  }
+  box.innerHTML = aiHistory.map(m=>`<div style="display:flex;justify-content:${m.role==='user'?'flex-end':'flex-start'};margin-bottom:6px;">
+    <div style="max-width:80%;padding:8px 12px;border-radius:10px;font-size:13px;line-height:1.7;
+      background:${m.role==='user'?'linear-gradient(135deg,var(--gold-light),var(--gold))':'#0e0c09'};
+      color:${m.role==='user'?'#1a1408':'var(--text)'};border:${m.role==='user'?'none':'1px solid var(--border)'};white-space:pre-wrap;">
+      ${escapeHtml(m.text)}
+    </div>
+  </div>`).join('');
+  box.scrollTop = box.scrollHeight;
+}
+function getApiKey(){ return localStorage.getItem('lawyer_api_key') || ''; }
+async function callClaude(prompt, useSearch){
+  const key = getApiKey();
+  if(!key){ toast('من فضلك أضف مفتاح API من الإعدادات ⚙️'); return null; }
+  try{
+    const body = {
+      model:'claude-sonnet-4-6', max_tokens:1000,
+      messages:[{role:'user', content: prompt}]
+    };
+    if(useSearch) body.tools = [{type:'web_search_20250305', name:'web_search'}];
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body: JSON.stringify(body)
+    });
+    const data = await res.json();
+    if(data.error){ toast('خطأ: '+data.error.message); return null; }
+    return (data.content||[]).filter(c=>c.type==='text').map(c=>c.text).join('\n');
+  }catch(e){ console.error(e); toast('حدث خطأ في الاتصال بالمساعد'); return null; }
+}
+async function sendAI(){
+  const input = document.getElementById('ai-input');
+  const text = input.value.trim();
+  if(!text) return;
+  aiHistory.push({role:'user', text});
+  input.value='';
+  renderAIChat();
+  const reply = await callClaude(text, false);
+  if(reply){ aiHistory.push({role:'assistant', text:reply}); renderAIChat(); }
+}
+async function webSearchAI(){
+  const input = document.getElementById('ai-input');
+  const text = input.value.trim();
+  if(!text){ toast('اكتب استفسارك أولاً ثم اضغط بحث'); return; }
+  aiHistory.push({role:'user', text:'🔍 '+text});
+  input.value='';
+  renderAIChat();
+  const reply = await callClaude('ابحث في الإنترنت عن: '+text+'. أعطني ملخصاً قانونياً دقيقاً بالعربية مع ذكر المصادر.', true);
+  if(reply){ aiHistory.push({role:'assistant', text:reply}); renderAIChat(); }
+}
+let recognition = null, isRecording = false;
+function toggleMic(){
+  const btn = document.getElementById('mic-btn');
+  if(!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)){
+    toast('المتصفح لا يدعم التعرف الصوتي'); return;
+  }
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!recognition){
+    recognition = new SR();
+    recognition.lang='ar-EG';
+    recognition.onresult = (e)=>{
+      document.getElementById('ai-input').value = e.results[0][0].transcript;
+    };
+    recognition.onend = ()=>{ isRecording=false; btn.textContent='🎤'; };
+  }
+  if(isRecording){ recognition.stop(); isRecording=false; btn.textContent='🎤'; }
+  else { recognition.start(); isRecording=true; btn.textContent='⏹️'; }
+}
+
+// ============ DOCUMENT EDITOR ============
+function fmt(cmd){ document.execCommand(cmd, false, null); document.getElementById('editor-area').focus(); }
+function saveEditorDoc(){
+  const title = document.getElementById('editor-title').value.trim() || 'مستند بدون عنوان';
+  DB.docs.push({id:uid(), caseId:'', name:title, type:'محرر', notes:'تم إنشاؤه في المحرر', content:document.getElementById('editor-area').innerHTML, createdAt:Date.now()});
+  save('docs');
+  toast('تم حفظ المستند');
+}
+// ============ UNIVERSAL SHARE / PRINT / COPY TOOLBAR ============
+// Generic helpers usable from any part of the app (editor, documents,
+// finance reports, forms, case summaries...) - given a title and plain
+// text/HTML content, they print, copy, or share via WhatsApp/Telegram/Email.
+function universalPrint(title, htmlContent){
+  const w = window.open('', '_blank');
+  w.document.write(`<html dir="rtl" lang="ar"><head><meta charset="utf-8"><title>${escapeHtml(title)}</title>
+    <style>body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;padding:30px;line-height:1.9;}h1{text-align:center;margin-bottom:20px;}</style>
+    </head><body><h1>${escapeHtml(title)}</h1>${htmlContent}</body></html>`);
+  w.document.close();
+  w.print();
+}
+function universalCopy(text){
+  navigator.clipboard.writeText(text).then(()=>toast('تم النسخ'));
+}
+function universalShare(platform, title, text){
+  const payload = encodeURIComponent(title + '\n\n' + text);
+  if(platform==='whatsapp') window.open('https://wa.me/?text='+payload, '_blank');
+  else if(platform==='telegram') window.open('https://t.me/share/url?url=&text='+payload, '_blank');
+  else if(platform==='email') window.open('mailto:?subject='+encodeURIComponent(title)+'&body='+payload, '_blank');
+}
+// Renders a compact row of print/copy/share buttons. `getContent()` should
+// return {title, html, text} - called lazily when a button is pressed so
+// the content always reflects the latest state.
+function shareToolbarHtml(getContentFnName){
+  return `<div class="tabs-row" style="margin-top:8px;">
+    <button class="secondary" onclick="__shareAction('${getContentFnName}','print')">🖨️ طباعة / PDF</button>
+    <button class="secondary" onclick="__shareAction('${getContentFnName}','copy')">📋 نسخ</button>
+    <button class="secondary" onclick="__shareAction('${getContentFnName}','whatsapp')">📱 واتساب</button>
+    <button class="secondary" onclick="__shareAction('${getContentFnName}','telegram')">✈️ تليجرام</button>
+    <button class="secondary" onclick="__shareAction('${getContentFnName}','email')">✉️ بريد</button>
+  </div>`;
+}
+function __shareAction(fnName, action){
+  const fn = window[fnName];
+  if(typeof fn !== 'function'){ toast('تعذر تجهيز المحتوى للمشاركة'); return; }
+  const content = fn();
+  if(!content) return;
+  const {title, html, text} = content;
+  if(action==='print') universalPrint(title, html || `<pre style="white-space:pre-wrap;font-family:inherit;">${escapeHtml(text)}</pre>`);
+  else if(action==='copy') universalCopy(text);
+  else universalShare(action, title, text);
+}
+
+function printEditorDoc(){
+  const title = document.getElementById('editor-title').value.trim() || 'مستند';
+  const content = document.getElementById('editor-area').innerHTML;
+  universalPrint(title, content);
+}
+function copyEditorDoc(){
+  const content = document.getElementById('editor-area').innerText;
+  universalCopy(content);
+}
+function shareEditorDoc(platform){
+  const title = document.getElementById('editor-title').value.trim() || 'مستند';
+  const content = document.getElementById('editor-area').innerText;
+  universalShare(platform, title, content);
+}
+const TEMPLATES = {
+  power: `<h4 style="text-align:center;">توكيل عام</h4><p>أنا الموقع أدناه/ ..................، الموكل بموجب هذا التوكيل السيد/ ..................، للقيام بالأعمال القانونية الآتية:</p><p>1- تمثيلي أمام جميع المحاكم بدرجاتها وأنواعها.<br>2- تقديم وتوقيع الطلبات والصحف والمذكرات.<br>3- التصالح والتنازل والقبض والإقرار بما يراه محققاً لمصلحتي.</p><p>وذلك تحريراً في ..../..../.......</p>`,
+  warning: `<h4 style="text-align:center;">إنذار رسمي</h4><p>السيد/ .................. المحترم</p><p>بناءً على تكليف من السيد/ .................. (الموكل)، نوجه إليكم هذا الإنذار للمطالبة بـ .................. وذلك خلال أسبوع من تاريخ إعلانكم بهذا الإنذار، وفي حالة عدم الاستجابة سنضطر مضطرين لاتخاذ كافة الإجراءات القانونية لحفظ حقوق موكلنا.</p>`,
+  claim: `<h4 style="text-align:center;">صحيفة دعوى</h4><p>محكمة .................. الموقرة</p><p><b>المدعي:</b> ..................<br><b>المدعى عليه:</b> ..................</p><p><b>الموضوع:</b> ..................</p><p><b>الوقائع:</b><br>1- ..................<br>2- ..................</p><p><b>السند القانوني:</b> ..................</p><p><b>الطلبات:</b><br>1- ..................<br>2- إلزام المدعى عليه بالمصاريف والأتعاب.</p>`,
+  memo: `<h4 style="text-align:center;">مذكرة دفاع</h4><p>مذكرة بدفاع السيد/ .................. (المدعى عليه) في الدعوى رقم .................. لسنة ..................</p><p><b>أولاً: الدفع بـ ..................</b><br>..................</p><p><b>ثانياً: الدفع بـ ..................</b><br>..................</p><p><b>الطلبات:</b><br>رفض الدعوى وإلزام المدعي بالمصاريف.</p>`,
+  contract: `<h4 style="text-align:center;">عقد</h4><p>تم الاتفاق بين:</p><p><b>الطرف الأول:</b> ..................<br><b>الطرف الثاني:</b> ..................</p><p><b>على ما يلي:</b><br>1- ..................<br>2- ..................<br>3- مدة هذا العقد ..................</p><p>وقد تم التوقيع على هذا العقد من الطرفين بتاريخ ..../..../.......</p>`,
+};
+function loadTemplate(key){
+  document.getElementById('editor-area').innerHTML = TEMPLATES[key] || '';
+  document.getElementById('editor-title').value =
+    {power:'توكيل عام',warning:'إنذار رسمي',claim:'صحيفة دعوى',memo:'مذكرة دفاع',contract:'عقد'}[key] || '';
+  toast('تم تحميل الصيغة في المحرر');
+}
+
+// ============ NOTIFICATIONS ============
+async function renderNotif(){
+  const list = document.getElementById('notif-list');
+  list.innerHTML = `<div class="empty"><span class="icon">🔔</span>جاري التحميل...</div>`;
+  const notifs = await cloudLoadNotifications();
+  if(!notifs || notifs.length===0){
+    list.innerHTML = `<div class="empty"><span class="icon">🔔</span>لا توجد تنبيهات حالياً.</div>`;
+    return;
+  }
+  list.innerHTML = notifs.map(n=>`<div class="item"><div class="info">
+    <b>${escapeHtml(n.text)}</b>
+    ${n.due_at?`<div class="meta">📅 ${formatDateTime(n.due_at)}</div>`:''}
+    <div class="meta">${formatDateTime(n.created_at)}</div>
+  </div></div>`).join('');
+}
+subscribeNotificationsRealtime((n)=>{
+  if(document.getElementById('page-notif').classList.contains('active')) renderNotif();
+  toast('🔔 '+n.text);
+});
+
+// ============ TEAM ============
+const roleLabel = {owner:'مالك المكتب', lawyer:'محامي', assistant:'مساعد قانوني', secretary:'سكرتارية'};
+let teamCache = [];
+function openTeamModal(id){
+  document.getElementById('team-id').value = id || '';
+  if(id){
+    const m = teamCache.find(x=>x.id===id);
+    document.getElementById('team-modal-title').textContent='تعديل عضو الفريق';
+    document.getElementById('team-name').value = m.name;
+    document.getElementById('team-email').value = m.email;
+    document.getElementById('team-role').value = m.role;
+    document.getElementById('perm-clients').checked = !!m.perms.clients;
+    document.getElementById('perm-cases').checked = !!m.perms.cases;
+    document.getElementById('perm-docs').checked = !!m.perms.docs;
+    document.getElementById('perm-chat').checked = !!m.perms.chat;
+    document.getElementById('perm-finance').checked = !!m.perms.finance;
+  } else {
+    document.getElementById('team-modal-title').textContent='إضافة عضو للفريق';
+    ['team-name','team-email'].forEach(f=>document.getElementById(f).value='');
+    document.getElementById('team-role').value='lawyer';
+    ['perm-clients','perm-cases','perm-docs','perm-chat','perm-finance'].forEach(f=>document.getElementById(f).checked=false);
+  }
+  document.getElementById('modal-team').classList.add('open');
+}
+async function saveTeam(){
+  const id = document.getElementById('team-id').value;
+  const name = document.getElementById('team-name').value.trim();
+  if(!name){ toast('من فضلك أدخل اسم العضو'); return; }
+  const data = {
+    name, email: document.getElementById('team-email').value.trim(),
+    role: document.getElementById('team-role').value,
+    perms:{
+      clients: document.getElementById('perm-clients').checked,
+      cases: document.getElementById('perm-cases').checked,
+      docs: document.getElementById('perm-docs').checked,
+      chat: document.getElementById('perm-chat').checked,
+      finance: document.getElementById('perm-finance').checked,
+    }
+  };
+  let m;
+  if(id){ m = teamCache.find(x=>x.id===id); Object.assign(m,data); }
+  else { m = {id:uid(), ...data, createdAt:Date.now()}; teamCache.push(m); }
+  const ok = await cloudSaveTeamMember(m);
+  toast('تم حفظ بيانات العضو');
+  closeModal('modal-team');
+  renderTeam();
+}
+async function deleteTeamMember(id){
+  if(!confirm('هل تريد حذف هذا العضو من الفريق؟')) return;
+  await cloudDeleteTeamMember(id);
+  teamCache = teamCache.filter(x=>x.id!==id);
+  renderTeam();
+}
+async function renderTeam(){
+  const list = document.getElementById('team-list');
+  list.innerHTML = `<div class="empty"><span class="icon">👥</span>جاري التحميل...</div>`;
+  const loaded = await cloudLoadTeam();
+  if(loaded) teamCache = loaded;
+  if(teamCache.length===0){
+    list.innerHTML = `<div class="empty"><span class="icon">👥</span>لا يوجد أعضاء بالفريق.<br>اضغط "إضافة عضو للفريق" للبدء.</div>`;
+  } else {
+    list.innerHTML = teamCache.map(m=>{
+      const perms = Object.entries(m.perms||{}).filter(([k,v])=>v).map(([k])=>({
+        clients:'الموكلين',cases:'القضايا',docs:'المستندات',chat:'الدردشة',finance:'المالية'
+      }[k])).join('، ');
+      return `<div class="item"><div class="info">
+        <b>${escapeHtml(m.name)}</b> <span class="badge info">${roleLabel[m.role]||m.role}</span>
+        <div class="meta">${escapeHtml(m.email||'')}</div>
+        ${perms?`<div class="meta">الصلاحيات: ${perms}</div>`:'<div class="meta">بدون صلاحيات إضافية</div>'}
+      </div>
+      <div class="actions">
+        <button class="secondary" onclick="openTeamModal('${m.id}')">تعديل</button>
+        <button class="danger" onclick="deleteTeamMember('${m.id}')">حذف</button>
+      </div></div>`;
+    }).join('');
+  }
+  renderTeamChatAsSelect();
+  renderTeamChatMessages();
+}
+
+// ---- Internal team chat UI ----
+function renderTeamChatAsSelect(){
+  const sel = document.getElementById('team-chat-as');
+  if(!sel) return;
+  const options = [{id:'owner', name:'مالك المكتب (أنت)'}].concat(
+    teamCache.map(m=>({id:m.id, name:m.name}))
+  );
+  const prevValue = sel.value;
+  sel.innerHTML = options.map(o=>`<option value="${o.id}">${escapeHtml(o.name)}</option>`).join('');
+  if(prevValue && options.some(o=>o.id===prevValue)) sel.value = prevValue;
+}
+function renderTeamChatMessages(){
+  const box = document.getElementById('team-chat-messages');
+  if(!box) return;
+  const msgs = loadTeamChat();
+  if(msgs.length===0){
+    box.innerHTML = `<div class="empty"><span class="icon">💬</span>لا توجد رسائل بعد. ابدأ محادثة الفريق هنا.</div>`;
+    return;
+  }
+  box.innerHTML = msgs.map(m=>`<div style="margin-bottom:8px;">
+    <div style="font-size:11px;color:var(--gold-light);font-weight:bold;">${escapeHtml(m.authorName)}</div>
+    <div style="background:#0e0c09;border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:13px;margin-top:2px;">${escapeHtml(m.text)}</div>
+  </div>`).join('');
+  box.scrollTop = box.scrollHeight;
+}
+function sendTeamChatMsg(){
+  const input = document.getElementById('team-chat-input');
+  const text = input.value.trim();
+  if(!text) return;
+  const sel = document.getElementById('team-chat-as');
+  let authorName = 'مالك المكتب';
+  if(sel && sel.value !== 'owner'){
+    const m = teamCache.find(x=>x.id===sel.value);
+    if(m) authorName = m.name;
+  }
+  postTeamChatMessage(authorName, text);
+  input.value = '';
+  renderTeamChatMessages();
+}
+
+// ============ HOME ============
+function renderHome(){
+  document.getElementById('stat-clients').textContent = DB.clients.length;
+  document.getElementById('stat-cases').textContent = DB.cases.length;
+  document.getElementById('stat-sessions').textContent = DB.sessions.length;
+
+  const now = new Date();
+  const upcoming = DB.sessions.filter(s=>new Date(s.date)>=now).sort((a,b)=>new Date(a.date)-new Date(b.date)).slice(0,3);
+  const upEl = document.getElementById('upcoming-sessions');
+  upEl.innerHTML = upcoming.length===0
+    ? `<div class="empty">لا توجد جلسات قادمة.</div>`
+    : upcoming.map(s=>{
+        const c = DB.cases.find(x=>x.id===s.caseId);
+        return `<div class="item"><div class="info">
+          <b>${escapeHtml(s.type)}</b>
+          <div class="meta">📁 ${escapeHtml(c?c.number:'—')}</div>
+          <div class="meta">🕐 ${formatDateTime(s.date)}</div>
+        </div></div>`;
+      }).join('');
+
+  const recent = [...DB.cases].sort((a,b)=>b.createdAt-a.createdAt).slice(0,3);
+  const rcEl = document.getElementById('recent-cases');
+  rcEl.innerHTML = recent.length===0
+    ? `<div class="empty">لا توجد قضايا مسجلة.</div>`
+    : recent.map(c=>`<div class="item" onclick="showCaseDetail('${c.id}')" style="cursor:pointer;"><div class="info">
+        <b>${escapeHtml(c.number)}</b> <span class="badge ${statusClass[c.status]}">${statusLabel[c.status]}</span>
+        <div class="meta">${escapeHtml(getClientName(c.clientId)||'بدون موكل')}</div>
+      </div></div>`).join('');
+}
+
+// ============ SETTINGS ============
+function openSettings(){
+  document.getElementById('api-key-input').value = getApiKey();
+  document.getElementById('modal-settings').classList.add('open');
+}
+function saveApiKey(){
+  const key = document.getElementById('api-key-input').value.trim();
+  localStorage.setItem('lawyer_api_key', key);
+  toast('تم حفظ المفتاح');
+  closeModal('modal-settings');
+}
+</script>
+<script>
+// ============ FINANCE ============
+function openFinModal(kind){
+  fillCaseSelect('fin-case');
+  document.getElementById('fin-id').value = '';
+  document.getElementById('fin-kind').value = kind;
+  document.getElementById('fin-modal-title').textContent = kind==='income' ? '+ تسجيل دفعة أتعاب' : '+ تسجيل مصروف';
+  document.getElementById('fin-desc').value = '';
+  document.getElementById('fin-amount').value = '';
+  document.getElementById('fin-notes').value = '';
+  document.getElementById('fin-date').value = new Date().toISOString().slice(0,10);
+  document.getElementById('modal-fin').classList.add('open');
+}
+function saveFin(){
+  const desc = document.getElementById('fin-desc').value.trim();
+  const amount = parseFloat(document.getElementById('fin-amount').value);
+  if(!desc){ toast('من فضلك أدخل وصف الحركة'); return; }
+  if(!amount || amount<=0){ toast('من فضلك أدخل مبلغاً صحيحاً'); return; }
+  const kind = document.getElementById('fin-kind').value;
+  const caseId = document.getElementById('fin-case').value;
+  DB.finance.push({
+    id:uid(), kind, caseId, desc, amount,
+    date: document.getElementById('fin-date').value || new Date().toISOString().slice(0,10),
+    notes: document.getElementById('fin-notes').value.trim(),
+    createdAt: Date.now()
+  });
+  // If income linked to a case, update feePaid
+  if(kind==='income' && caseId){
+    const c = DB.cases.find(x=>x.id===caseId);
+    if(c){ c.feePaid = (c.feePaid||0) + amount; save('cases'); }
+  }
+  save('finance');
+  closeModal('modal-fin');
+  toast(kind==='income'?'تم تسجيل الدفعة':'تم تسجيل المصروف');
+  renderFinance();
+}
+function deleteFin(id){
+  if(!confirm('هل تريد حذف هذه الحركة المالية؟')) return;
+  const row = DB.finance.find(x=>x.id===id);
+  if(row && row.kind==='income' && row.caseId){
+    const c = DB.cases.find(x=>x.id===row.caseId);
+    if(c){ c.feePaid = Math.max(0,(c.feePaid||0) - row.amount); save('cases'); }
+  }
+  DB.finance = DB.finance.filter(x=>x.id!==id);
+  save('finance');
+  renderFinance();
+}
+function renderFinance(){
+  const income = DB.finance.filter(f=>f.kind==='income').reduce((s,f)=>s+f.amount,0);
+  const expense = DB.finance.filter(f=>f.kind==='expense').reduce((s,f)=>s+f.amount,0);
+  document.getElementById('fin-income').textContent = income.toLocaleString('ar-EG');
+  document.getElementById('fin-expense').textContent = expense.toLocaleString('ar-EG');
+  document.getElementById('fin-balance').textContent = (income-expense).toLocaleString('ar-EG');
+  const toolbarEl = document.getElementById('fin-share-toolbar');
+  if(toolbarEl) toolbarEl.innerHTML = shareToolbarHtml('getFinanceShareContent');
+
+  const list = document.getElementById('finance-list');
+  const items = [...DB.finance].sort((a,b)=>b.createdAt-a.createdAt);
+  if(items.length===0){
+    list.innerHTML = `<div class="empty"><span class="icon">💰</span>لا توجد حركات مالية مسجلة.</div>`;
+    return;
+  }
+  list.innerHTML = items.map(f=>{
+    const c = DB.cases.find(x=>x.id===f.caseId);
+    return `<div class="item"><div class="info">
+      <b>${escapeHtml(f.desc)}</b> <span class="badge ${f.kind==='income'?'active':'closed'}">${f.kind==='income'?'إيراد':'مصروف'}</span>
+      <div class="meta">${f.amount.toLocaleString('ar-EG')} ج.م · ${f.date}</div>
+      ${c?`<div class="meta">📁 ${escapeHtml(c.number)}</div>`:''}
+      ${f.notes?`<div class="meta">${escapeHtml(f.notes)}</div>`:''}
+    </div>
+    <div class="actions"><button class="danger" onclick="deleteFin('${f.id}')">حذف</button></div>
+    </div>`;
+  }).join('');
+}
+
+// ============ EXECUTION OF JUDGMENTS ============
+const EXECUTION_STEPS = {
+  civil: [
+    {title:'صدور الحكم وحيازة الصورة التنفيذية', notes:''},
+    {title:'إعلان الحكم للمحكوم عليه (عن طريق المحضرين)', notes:''},
+    {title:'تقديم طلب التنفيذ لقلم التنفيذ بالمحكمة', notes:''},
+    {title:'تشكيل ملف التنفيذ وسداد الرسوم', notes:''},
+    {title:'إنذار المحكوم عليه بالتنفيذ (مهلة قانونية)', notes:''},
+    {title:'اتخاذ إجراء التنفيذ (حجز / إخلاء / تسليم)', notes:''},
+    {title:'إعداد محضر الحجز / التسليم', notes:''},
+    {title:'بيع المحجوزات بالمزاد (إن لزم)', notes:''},
+    {title:'توزيع حصيلة التنفيذ على الدائنين', notes:''},
+    {title:'إغلاق ملف التنفيذ', notes:''},
+  ],
+  criminal: [
+    {title:'صدور الحكم النهائي البات', notes:''},
+    {title:'إرسال الحكم للنيابة العامة للتنفيذ', notes:''},
+    {title:'إعلان المحكوم عليه بالحكم', notes:''},
+    {title:'تنفيذ العقوبة السالبة للحرية (إن وجدت) أو الغرامة', notes:''},
+    {title:'متابعة التنفيذ بالسجون / مصلحة الضرائب (الغرامات)', notes:''},
+    {title:'تنفيذ العقوبات التبعية (مصادرة / حرمان من حقوق)', notes:''},
+    {title:'متابعة طلبات الإفراج (شرطي / صحي) إن وجدت', notes:''},
+    {title:'انتهاء تنفيذ العقوبة وإغلاق الملف', notes:''},
+  ]
+};
+function getExecutionSteps(type){ return EXECUTION_STEPS[type] || EXECUTION_STEPS.civil; }
+
+let currentExecutionCaseId = null;
+// ---- Share content provider for finance summary ----
+function getFinanceShareContent(){
+  const income = DB.finance.filter(f=>f.kind==='income').reduce((s,f)=>s+f.amount,0);
+  const expense = DB.finance.filter(f=>f.kind==='expense').reduce((s,f)=>s+f.amount,0);
+  const lines = [];
+  lines.push('-- ملخص المالية --');
+  lines.push(`الإيرادات: ${income.toLocaleString('ar-EG')} ج.م`);
+  lines.push(`المصروفات: ${expense.toLocaleString('ar-EG')} ج.م`);
+  lines.push(`الصافي: ${(income-expense).toLocaleString('ar-EG')} ج.م`);
+  lines.push('');
+  lines.push('-- آخر الحركات --');
+  [...DB.finance].sort((a,b)=>b.createdAt-a.createdAt).slice(0,20).forEach(f=>{
+    const c = DB.cases.find(x=>x.id===f.caseId);
+    lines.push(`${f.date} - ${f.kind==='income'?'إيراد':'مصروف'}: ${f.desc} (${f.amount.toLocaleString('ar-EG')} ج.م)${c?' - '+c.number:''}`);
+  });
+  const text = lines.join('\n');
+  return {title:'التقرير المالي', html:`<div style="white-space:pre-wrap;line-height:1.9;">${escapeHtml(text)}</div>`, text};
+}
+
+function renderExecution(){
+  const sel = document.getElementById('execution-case-select');
+  const hint = document.getElementById('execution-no-cases-hint');
+  if(DB.cases.length === 0){
+    sel.innerHTML = '<option value="">— لا توجد قضايا مسجلة —</option>';
+    sel.disabled = true;
+    if(hint) hint.style.display = 'block';
+    document.getElementById('execution-track-card').style.display='none';
+    return;
+  }
+  sel.disabled = false;
+  if(hint) hint.style.display = 'none';
+  sel.innerHTML = '<option value="">— اختر القضية —</option>' +
+    DB.cases.map(c=>`<option value="${c.id}">${escapeHtml(c.number)} - ${escapeHtml(getClientName(c.clientId)||'بدون موكل')}</option>`).join('');
+  if(currentExecutionCaseId && DB.cases.find(c=>c.id===currentExecutionCaseId)){
+    sel.value = currentExecutionCaseId;
+    renderExecutionTrack();
+  } else {
+    document.getElementById('execution-track-card').style.display='none';
+  }
+}
+function goToExecutionForCase(caseId){
+  currentExecutionCaseId = caseId;
+  showPageDirect('execution');
+}
+function renderExecutionTrack(){
+  const caseId = document.getElementById('execution-case-select').value;
+  currentExecutionCaseId = caseId;
+  const card = document.getElementById('execution-track-card');
+  if(!caseId){ card.style.display='none'; return; }
+  card.style.display='block';
+  let exec = DB.executions.find(e=>e.caseId===caseId);
+  if(!exec){
+    exec = {id:uid(), caseId, type:'civil', currentStep:0, stepNotes:{}, createdAt:Date.now()};
+    DB.executions.push(exec);
+    save('executions');
+  }
+  document.getElementById('exec-tab-civil').className = exec.type==='civil' ? '' : 'secondary';
+  document.getElementById('exec-tab-criminal').className = exec.type==='criminal' ? '' : 'secondary';
+  const steps = getExecutionSteps(exec.type);
+  const track = document.getElementById('execution-progress');
+  track.innerHTML = steps.map((s,i)=>{
+    let cls = '';
+    if(i < exec.currentStep) cls='done';
+    else if(i === exec.currentStep) cls='current';
+    const dotContent = i < exec.currentStep ? '✓' : (i+1);
+    return `<div class="progress-step ${cls}">
+      <div class="dot">${dotContent}</div>
+      <div class="step-content">
+        <div class="step-title">${escapeHtml(s.title)}</div>
+        ${exec.stepNotes && exec.stepNotes[i] ? `<div class="step-notes">${escapeHtml(exec.stepNotes[i])}</div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('execution-step-notes').value = (exec.stepNotes && exec.stepNotes[exec.currentStep]) || '';
+}
+function setExecutionType(type){
+  const exec = DB.executions.find(e=>e.caseId===currentExecutionCaseId);
+  if(!exec) return;
+  if(exec.type !== type){
+    exec.type = type;
+    exec.currentStep = 0;
+    exec.stepNotes = {};
+    save('executions');
+  }
+  renderExecutionTrack();
+}
+function advanceExecutionStep(){
+  const exec = DB.executions.find(e=>e.caseId===currentExecutionCaseId);
+  if(!exec) return;
+  const steps = getExecutionSteps(exec.type);
+  if(exec.currentStep < steps.length-1){
+    exec.currentStep++;
+    save('executions');
+    renderExecutionTrack();
+    toast('تم الانتقال للمرحلة التالية');
+  } else {
+    toast('هذه آخر مرحلة في مسار التنفيذ');
+  }
+}
+function saveExecutionNotes(){
+  const exec = DB.executions.find(e=>e.caseId===currentExecutionCaseId);
+  if(!exec) return;
+  if(!exec.stepNotes) exec.stepNotes = {};
+  exec.stepNotes[exec.currentStep] = document.getElementById('execution-step-notes').value.trim();
+  save('executions');
+  renderExecutionTrack();
+  toast('تم حفظ الملاحظات');
+}
+
+// ============ BAILIFF ACTIONS ============
+const bailiffStatusLabel = {pending:'قيد التنفيذ', done:'تم التنفيذ', failed:'لم يتم / يحتاج إعادة'};
+function openBailiffModal(id){
+  fillCaseSelect('bailiff-case');
+  document.getElementById('bailiff-id').value = id || '';
+  if(id){
+    const b = DB.bailiff.find(x=>x.id===id);
+    document.getElementById('bailiff-modal-title').textContent='تعديل إجراء المحضرين';
+    document.getElementById('bailiff-case').value = b.caseId;
+    document.getElementById('bailiff-type').value = b.type;
+    document.getElementById('bailiff-target').value = b.target;
+    document.getElementById('bailiff-date').value = b.date;
+    document.getElementById('bailiff-status').value = b.status;
+    document.getElementById('bailiff-notes').value = b.notes;
+  } else {
+    document.getElementById('bailiff-modal-title').textContent='تسجيل إجراء محضرين';
+    ['bailiff-target','bailiff-notes'].forEach(f=>document.getElementById(f).value='');
+    document.getElementById('bailiff-type').value='إعلان';
+    document.getElementById('bailiff-status').value='pending';
+    document.getElementById('bailiff-date').value = new Date().toISOString().slice(0,10);
+  }
+  document.getElementById('modal-bailiff').classList.add('open');
+}
+function saveBailiff(){
+  const id = document.getElementById('bailiff-id').value;
+  const target = document.getElementById('bailiff-target').value.trim();
+  if(!target){ toast('من فضلك أدخل الجهة أو الشخص المطلوب إعلانه'); return; }
+  const data = {
+    caseId: document.getElementById('bailiff-case').value,
+    type: document.getElementById('bailiff-type').value,
+    target,
+    date: document.getElementById('bailiff-date').value,
+    status: document.getElementById('bailiff-status').value,
+    notes: document.getElementById('bailiff-notes').value.trim(),
+  };
+  if(id){
+    const b = DB.bailiff.find(x=>x.id===id);
+    Object.assign(b,data);
+    toast('تم تعديل الإجراء');
+  } else {
+    DB.bailiff.push({id:uid(),...data,createdAt:Date.now()});
+    toast('تم تسجيل الإجراء');
+  }
+  save('bailiff');
+  closeModal('modal-bailiff');
+  renderBailiff();
+}
+function deleteBailiff(id){
+  if(!confirm('هل تريد حذف هذا الإجراء؟')) return;
+  DB.bailiff = DB.bailiff.filter(x=>x.id!==id);
+  save('bailiff');
+  renderBailiff();
+}
+function renderBailiff(){
+  const list = document.getElementById('bailiff-list');
+  const items = [...DB.bailiff].sort((a,b)=>b.createdAt-a.createdAt);
+  if(items.length===0){
+    list.innerHTML = `<div class="empty"><span class="icon">📜</span>لا توجد إجراءات محضرين مسجلة.<br>اضغط "تسجيل إجراء محضرين جديد" للبدء.</div>`;
+    return;
+  }
+  list.innerHTML = items.map(b=>{
+    const c = DB.cases.find(x=>x.id===b.caseId);
+    const badgeCls = b.status==='done'?'active':b.status==='failed'?'closed':'pending';
+    return `<div class="item"><div class="info">
+      <b>${escapeHtml(b.type)}</b> <span class="badge ${badgeCls}">${bailiffStatusLabel[b.status]}</span>
+      <div class="meta">${escapeHtml(b.target)}</div>
+      ${c?`<div class="meta">📁 ${escapeHtml(c.number)}</div>`:''}
+      <div class="meta">📅 ${b.date||''}</div>
+      ${b.notes?`<div class="meta">${escapeHtml(b.notes)}</div>`:''}
+    </div>
+    <div class="actions">
+      <button class="secondary" onclick="openBailiffModal('${b.id}')">تعديل</button>
+      <button class="danger" onclick="deleteBailiff('${b.id}')">حذف</button>
+    </div></div>`;
+  }).join('');
+}
+</script>
+<script>
+// ============ LEGAL LIBRARY (LAWS PDF) ============
+function openLibraryModal(id){
+  document.getElementById('library-id').value = id || '';
+  document.getElementById('library-file').value = '';
+  if(id){
+    const l = DB.library.find(x=>x.id===id);
+    document.getElementById('library-modal-title').textContent='تعديل القانون';
+    document.getElementById('library-name').value = l.name;
+    document.getElementById('library-category').value = l.category;
+    document.getElementById('library-url').value = l.url || '';
+    document.getElementById('library-notes').value = l.notes || '';
+  } else {
+    document.getElementById('library-modal-title').textContent='إضافة قانون / تشريع';
+    ['library-name','library-url','library-notes'].forEach(f=>document.getElementById(f).value='');
+    document.getElementById('library-category').value='مدني';
+  }
+  document.getElementById('modal-library').classList.add('open');
+}
+function saveLibraryItem(){
+  const id = document.getElementById('library-id').value;
+  const name = document.getElementById('library-name').value.trim();
+  if(!name){ toast('من فضلك أدخل اسم القانون'); return; }
+  const url = document.getElementById('library-url').value.trim();
+  const fileInput = document.getElementById('library-file');
+  const data = {
+    name,
+    category: document.getElementById('library-category').value,
+    url,
+    notes: document.getElementById('library-notes').value.trim(),
+  };
+  const finishSave = (dataUrl)=>{
+    if(dataUrl) data.fileData = dataUrl;
+    if(id){
+      const l = DB.library.find(x=>x.id===id);
+      Object.assign(l,data);
+      toast('تم تعديل العنصر');
+    } else {
+      DB.library.push({id:uid(),...data,createdAt:Date.now()});
+      toast('تم إضافة القانون للمكتبة');
+    }
+    save('library');
+    closeModal('modal-library');
+    renderLibrary();
+  };
+  if(fileInput.files && fileInput.files[0]){
+    const file = fileInput.files[0];
+    if(file.size > 4*1024*1024){
+      toast('الملف كبير جداً للحفظ المحلي - استخدم رابط PDF بدلاً من ذلك');
+      finishSave(null);
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = ()=> finishSave(reader.result);
+    reader.readAsDataURL(file);
+  } else {
+    finishSave(null);
+  }
+}
+function deleteLibraryItem(id){
+  if(!confirm('هل تريد حذف هذا العنصر من المكتبة القانونية؟')) return;
+  DB.library = DB.library.filter(x=>x.id!==id);
+  save('library');
+  renderLibrary();
+}
+function openLibraryFile(id){
+  const l = DB.library.find(x=>x.id===id);
+  if(!l) return;
+  if(l.fileData) window.open(l.fileData, '_blank');
+  else if(l.url) window.open(l.url, '_blank');
+  else toast('لا يوجد ملف أو رابط مرتبط بهذا العنصر');
+}
+const LIBRARY_CATEGORY_ICON = {
+  'دستور':'📜','مدني':'⚖️','جنائي':'🚔','تجاري':'🏢','عمل':'👷','أحوال شخصية':'👪','إجراءات':'📋','أخرى':'📄'
+};
+function renderLibrary(){
+  const q = (document.getElementById('library-search')?.value || '').trim().toLowerCase();
+  const list = document.getElementById('library-list');
+  let items = DB.library;
+  if(q) items = items.filter(l=> l.name.toLowerCase().includes(q) || (l.category||'').toLowerCase().includes(q));
+  if(items.length===0){
+    list.innerHTML = `<div class="empty"><span class="icon">📚</span>المكتبة القانونية فارغة حالياً.<br>اضغط "إضافة قانون / تشريع" لبدء بناء مكتبتك.</div>`;
+    return;
+  }
+  list.innerHTML = items.map(l=>`<div class="item law-pdf-item">
+    <div class="file-icon">${LIBRARY_CATEGORY_ICON[l.category]||'📄'}</div>
+    <div class="info" onclick="openLibraryFile('${l.id}')" style="cursor:pointer;">
+      <b>${escapeHtml(l.name)}</b>
+      <div class="meta">${escapeHtml(l.category)} ${l.fileData?'· 📎 ملف محفوظ':l.url?'· 🔗 رابط':'· لا يوجد ملف'}</div>
+      ${l.notes?`<div class="meta">${escapeHtml(l.notes)}</div>`:''}
+    </div>
+    <div class="actions">
+      <button class="secondary" onclick="openLibraryModal('${l.id}')">تعديل</button>
+      <button class="danger" onclick="deleteLibraryItem('${l.id}')">حذف</button>
+    </div>
+  </div>`).join('');
+}
+
+// ============ FORMS / TEMPLATES LIBRARY ============
+const FORMS_LIBRARY = {
+  lawsuits: [
+    {key:'claim_civil', title:'صحيفة دعوى مدنية (مطالبة مالية)', content:`<h4>صحيفة دعوى</h4><p>محكمة .................. الجزئية / الابتدائية</p><p><b>المدعي:</b> .................. ويعلن بـ ..................<br><b>المدعى عليه:</b> .................. ويعلن بـ ..................</p><p><b>الموضوع:</b> دعوى مطالبة بمبلغ مالي وقدره .................. جنيه.</p><p><b>الوقائع:</b><br>بموجب .................. (سند الدين / العقد / الفاتورة)، يكون المدعى عليه مديناً للمدعي بمبلغ .................. جنيه، وقد امتنع عن السداد بالرغم من تكرار المطالبة وإنذاره رسمياً بتاريخ ....../....../........</p><p><b>السند القانوني:</b> عملاً بأحكام القانون المدني المصري فيما يتعلق بالالتزامات والعقود، والمواد الخاصة بالمسؤولية التعاقدية.</p><p><b>الطلبات:</b><br>1- إلزام المدعى عليه بأن يؤدي للمدعي مبلغ .................. جنيه.<br>2- إلزامه بالفوائد القانونية من تاريخ الاستحقاق حتى السداد.<br>3- إلزامه بالمصاريف ومقابل أتعاب المحاماة.</p>`},
+    {key:'claim_labor', title:'دعوى عمالية (مستحقات عمالية)', content:`<h4>صحيفة دعوى عمالية</h4><p>محكمة .................. (دائرة المنازعات العمالية)</p><p><b>المدعي (العامل):</b> ..................<br><b>المدعى عليها (الشركة):</b> ..................</p><p><b>الموضوع:</b> مطالبة بمستحقات عمالية (أجر / مكافأة نهاية خدمة / بدل إجازات / تعويض فصل تعسفي).</p><p><b>الوقائع:</b><br>عمل المدعي لدى المدعى عليها بوظيفة .................. منذ تاريخ ....../....../........ وحتى تاريخ ....../....../........، وقد امتنعت الشركة عن أداء مستحقاته المتمثلة في ..................</p><p><b>السند القانوني:</b> أحكام قانون العمل المصري فيما يتعلق بحقوق العامل عند انتهاء عقد العمل.</p><p><b>الطلبات:</b><br>1- إلزام المدعى عليها بأداء مستحقات المدعي وقدرها .................. جنيه.<br>2- التعويض عن الفصل التعسفي (إن وجد).<br>3- المصاريف والأتعاب.</p>`},
+    {key:'claim_eviction', title:'دعوى طرد للغصب / إخلاء عقار', content:`<h4>صحيفة دعوى طرد للغصب</h4><p>محكمة .................. الابتدائية (دائرة مستعجل)</p><p><b>المدعي:</b> .................. (مالك العقار)<br><b>المدعى عليه:</b> .................. (الشاغل بدون سند)</p><p><b>الموضوع:</b> دعوى طرد للغصب وتسليم العقار الموضح بالصحيفة.</p><p><b>الوقائع:</b><br>يمتلك المدعي العقار الكائن بـ .................. بموجب .................. (سند الملكية)، وقد استولى المدعى عليه على العقار / جزء منه دون سند قانوني، رغم إنذاره بالتخلية.</p><p><b>السند القانوني:</b> أحكام القانون المدني الخاصة بحماية حق الملكية ودعوى الاستحقاق.</p><p><b>الطلبات:</b><br>1- الحكم بطرد المدعى عليه من العقار وتسليمه للمدعي خالياً.<br>2- التعويض عن مدة الانتفاع بدون سند (إن وجد).<br>3- المصاريف والأتعاب.</p>`},
+    {key:'claim_divorce', title:'دعوى أحوال شخصية (خلع / طلاق)', content:`<h4>صحيفة دعوى أحوال شخصية</h4><p>محكمة الأسرة بـ ..................</p><p><b>المدعية:</b> ..................<br><b>المدعى عليه:</b> ..................</p><p><b>الموضوع:</b> دعوى خلع / تطليق للضرر (حسب الحالة).</p><p><b>الوقائع:</b><br>زواج المدعية بالمدعى عليه بموجب وثيقة زواج رقم .................. تاريخ ....../....../........، وقد نشأت خلافات بين الطرفين تتمثل في .................. مما يجعل استمرار الحياة الزوجية مستحيلاً.</p><p><b>السند القانوني:</b> أحكام قانون الأحوال الشخصية المصري المنظمة للخلع / التطليق للضرر.</p><p><b>الطلبات:</b><br>1- الحكم بتطليق المدعية من المدعى عليه (خلعاً / للضرر).<br>2- إثبات حالة الزوجية وتوابعها من نفقة ورؤية إن وجدت.</p>`},
+  ],
+  memos: [
+    {key:'memo_defense', title:'مذكرة دفاع عامة', content:`<h4>مذكرة بدفاع</h4><p>في الدعوى رقم .................. لسنة .................. أمام محكمة ..................</p><p><b>المقدمة من:</b> .................. (المدعى عليه)</p><p><b>الوقائع:</b><br>تتحصل وقائع هذه الدعوى في .................. </p><p><b>أوجه الدفاع:</b></p><p><b>أولاً: الدفع بعدم قبول الدعوى</b><br>.................. (الأسانيد)</p><p><b>ثانياً: الدفع بعدم الاختصاص</b><br>.................. (الأسانيد)</p><p><b>ثالثاً: الدفاع في الموضوع</b><br>.................. (الرد على ادعاءات المدعي مع الأسانيد المستندية)</p><p><b>الطلبات:</b><br>أولاً (احتياطياً): رفض الدعوى.<br>ثانياً (أصلياً): القضاء بعدم قبولها / عدم الاختصاص.<br>وفي جميع الأحوال إلزام المدعي بالمصاريف والأتعاب.</p>`},
+    {key:'memo_appeal', title:'مذكرة استئناف', content:`<h4>مذكرة أسباب استئناف</h4><p>عن الحكم الصادر من محكمة .................. في الدعوى رقم .................. لسنة ..................، والمستأنف بالاستئناف رقم .................. لسنة ..................</p><p><b>المستأنف:</b> ..................<br><b>المستأنف ضده:</b> ..................</p><p><b>أسباب الاستئناف:</b></p><p><b>السبب الأول: مخالفة الحكم المستأنف للثابت بالأوراق</b><br>.................. </p><p><b>السبب الثاني: مخالفة الحكم المستأنف للقانون</b><br>.................. </p><p><b>السبب الثالث: قصور التسبيب</b><br>.................. </p><p><b>الطلبات:</b><br>قبول الاستئناف شكلاً، وفي الموضوع بإلغاء الحكم المستأنف والقضاء مجدداً بـ .................. مع إلزام المستأنف ضده بالمصاريف والأتعاب عن درجتي التقاضي.</p>`},
+    {key:'memo_criminal', title:'مذكرة دفاع جنائية', content:`<h4>مذكرة دفاع</h4><p>في القضية رقم .................. لسنة .................. جنح / جنايات .................. </p><p><b>المتهم:</b> ..................</p><p><b>التهمة المسندة:</b> ..................</p><p><b>أوجه الدفاع:</b></p><p><b>أولاً: انتفاء أركان الجريمة</b><br>.................. </p><p><b>ثانياً: بطلان إجراءات الضبط والتحقيق (إن وجد)</b><br>.................. </p><p><b>ثالثاً: انتفاء صلة المتهم بالواقعة / توافر سبب من أسباب الإباحة أو موانع العقاب</b><br>.................. </p><p><b>الطلبات:</b><br>أصلياً: ببراءة المتهم مما نسب إليه.<br>احتياطياً: تطبيق أحكام الرأفة والظروف المخففة.</p>`},
+  ],
+  contracts: [
+    {key:'contract_rent', title:'عقد إيجار', content:`<h4>عقد إيجار</h4><p>تم الاتفاق بين:</p><p><b>الطرف الأول (المؤجر):</b> ..................<br><b>الطرف الثاني (المستأجر):</b> ..................</p><p><b>على إيجار العين الموضحة بالعنوان:</b> .................. وذلك وفقاً للشروط الآتية:</p><p>1- مدة الإجارة: .................. تبدأ من ....../....../........<br>2- القيمة الإيجارية: .................. جنيه شهرياً/سنوياً تُدفع .................. <br>3- يلتزم المستأجر باستخدام العين في .................. فقط.<br>4- يلتزم المستأجر بالمحافظة على العين وردها بالحالة التي استلمها بها.<br>5- في حالة التأخر عن سداد القيمة الإيجارية لمدة .................. يحق للمؤجر فسخ العقد.</p><p>وقد تم التوقيع على هذا العقد من الطرفين بتاريخ ....../....../........</p>`},
+    {key:'contract_sale', title:'عقد بيع', content:`<h4>عقد بيع</h4><p>تم الاتفاق بين:</p><p><b>الطرف الأول (البائع):</b> ..................<br><b>الطرف الثاني (المشتري):</b> ..................</p><p><b>محل العقد:</b> .................. (وصف المبيع بالتفصيل)</p><p>1- باع الطرف الأول للطرف الثاني المبيع المذكور أعلاه مقابل ثمن إجمالي وقدره .................. جنيه.<br>2- يُسدد الثمن .................. (دفعة واحدة / على دفعات).<br>3- يلتزم البائع بتسليم المبيع للمشتري بتاريخ ....../....../........<br>4- يضمن البائع خلو المبيع من أي حقوق للغير أو نزاعات قائمة.</p><p>وقد تم التوقيع على هذا العقد من الطرفين بتاريخ ....../....../........</p>`},
+    {key:'contract_employment', title:'عقد عمل', content:`<h4>عقد عمل</h4><p>تم الاتفاق بين:</p><p><b>الطرف الأول (صاحب العمل):</b> ..................<br><b>الطرف الثاني (العامل):</b> ..................</p><p>1- يعمل الطرف الثاني لدى الطرف الأول بوظيفة .................. <br>2- مدة العقد: .................. (محدد / غير محدد المدة) تبدأ من ....../....../........<br>3- الأجر الشهري: .................. جنيه، يُصرف في تاريخ .................. من كل شهر.<br>4- مكان العمل: .................. <br>5- ساعات العمل: .................. ساعة يومياً، ويوم/أيام الراحة الأسبوعية: ..................<br>6- يلتزم الطرفان بأحكام قانون العمل المصري فيما لم يرد به نص خاص في هذا العقد.</p><p>وقد تم التوقيع على هذا العقد من الطرفين بتاريخ ....../....../........</p>`},
+    {key:'contract_partnership', title:'عقد شراكة', content:`<h4>عقد شراكة</h4><p>تم الاتفاق بين:</p><p><b>الشريك الأول:</b> ..................<br><b>الشريك الثاني:</b> ..................</p><p>1- يتفق الطرفان على تأسيس شراكة في نشاط .................. باسم ..................<br>2- رأس مال الشراكة: .................. جنيه، يساهم به الطرفان بنسبة .................. لكل منهما.<br>3- تكون الإدارة والتوقيع لـ ..................<br>4- توزع الأرباح والخسائر بنسبة .................. لكل شريك.<br>5- في حالة رغبة أحد الطرفين في الانسحاب يلتزم بإخطار الآخر قبل .................. مع تسوية حصته وفقاً لـ ..................</p><p>وقد تم التوقيع على هذا العقد من الطرفين بتاريخ ....../....../........</p>`},
+  ],
+  poa: [
+    {key:'poa_general', title:'توكيل عام', content:`<h4>توكيل عام</h4><p>أنا الموقع أدناه/ .................. بصفتي .................. أوكل بموجب هذا التوكيل السيد المحامي/ .................. المقيد بجدول نقابة المحامين تحت رقم .................. ليكون وكيلاً عني في:</p><p>1- تمثيلي أمام جميع المحاكم والنيابات والجهات الإدارية والقضائية بكافة درجاتها وأنواعها.<br>2- تقديم وتوقيع وسحب الطلبات والصحف والدعاوى والطعون والمذكرات.<br>3- الحضور في التحقيقات والجلسات والقبض والتسليم والتصالح والتنازل والإقرار وقطع سير الخصومة وتقديم الأدلة، وكل ما يراه محققاً لمصلحتي قانوناً.<br>4- توكيل الغير أو عزله في كل أو بعض ما ذُكر.</p><p>وذلك تحريراً في ....../....../........</p>`},
+    {key:'poa_specific', title:'توكيل خاص (بيع/شراء عقار)', content:`<h4>توكيل خاص</h4><p>أنا الموقع أدناه/ .................. أوكل السيد/ .................. ليكون وكيلاً عني خاصاً فيما يلي:</p><p>1- بيع / شراء العقار الموضح بياناته: .................. <br>2- التوقيع على عقود البيع الابتدائية والنهائية والتسجيل أمام مصلحة الشهر العقاري.<br>3- استلام / تسليم الثمن والتوقيع على ما يلزم من إيصالات.<br>4- اتخاذ كافة الإجراءات اللازمة لإتمام عملية البيع/الشراء أمام كافة الجهات المختصة.</p><p>وذلك تحريراً في ....../....../........</p>`},
+    {key:'warning_payment', title:'إنذار رسمي بالسداد', content:`<h4>إنذار على يد محضر</h4><p><b>المُنذر:</b> .................. ومحله المختار مكتب الأستاذ/ .................. المحامي بـ ..................<br><b>المُنذر إليه:</b> .................. ويعلن بـ ..................</p><p><b>الموضوع:</b> إنذار بالسداد ومطالبة بمستحقات مالية.</p><p>بناءً على طلب الموكل، ولأن المُنذر إليه مدين للموكل بمبلغ .................. جنيه بموجب .................. ولم يقم بالسداد رغم حلول الأجل والمطالبات الودية المتكررة، فإننا نوجه له هذا الإنذار لإلزامه بسداد المبلغ المذكور بالكامل خلال .................. أيام من تاريخ إعلانه بهذا الإنذار، وإلا سنضطر لاتخاذ كافة الإجراءات القانونية اللازمة لاستيفاء حق الموكل قضائياً مع تحميله بكافة المصاريف والتعويضات الناشئة عن ذلك.</p><p>وكيل المنذر / المحامي ..................</p>`},
+    {key:'warning_eviction', title:'إنذار بالتخلية', content:`<h4>إنذار على يد محضر</h4><p><b>المُنذر (المالك):</b> .................. <br><b>المُنذر إليه (الشاغل):</b> .................. ويعلن بـ ..................</p><p><b>الموضوع:</b> إنذار بتخلية العين المؤجرة وتسليمها.</p><p>حيث ينتهي عقد إيجار العين الموضحة بالعنوان: .................. بتاريخ ....../....../........ (أو لعدم سداد الأجرة المستحقة عن المدة من .................. إلى ..................)، فإننا نوجه لكم هذا الإنذار لتخلية العين المذكورة وتسليمها للمالك خالية من الأشخاص والمنقولات خلال .................. يوماً من تاريخ إعلانكم بهذا الإنذار، وإلا سنضطر لاتخاذ الإجراءات القضائية لطردكم من العين مع مطالبتكم بالتعويض عن مدة الإشغال غير المشروعة والمصاريف والأتعاب.</p>`},
+  ],
+};
+let currentFormsCategory = 'lawsuits';
+const FORMS_CATEGORY_LABEL = {lawsuits:'صحف الدعاوى', memos:'المذكرات', contracts:'العقود', poa:'التوكيلات والإنذارات'};
+function setFormsCategory(cat){
+  currentFormsCategory = cat;
+  Object.keys(FORMS_CATEGORY_LABEL).forEach(k=>{
+    document.getElementById('forms-tab-'+k).className = (k===cat) ? '' : 'secondary';
+  });
+  document.getElementById('forms-preview-card').style.display='none';
+  renderForms();
+}
+let currentFormPreview = null;
+function renderForms(){
+  Object.keys(FORMS_CATEGORY_LABEL).forEach(k=>{
+    document.getElementById('forms-tab-'+k).className = (k===currentFormsCategory) ? '' : 'secondary';
+  });
+  const list = document.getElementById('forms-list');
+  const items = FORMS_LIBRARY[currentFormsCategory] || [];
+  list.innerHTML = items.map(f=>`<div class="item" onclick="previewForm('${f.key}')" style="cursor:pointer;">
+    <div class="info"><b>${escapeHtml(f.title)}</b><div class="meta">اضغط للمعاينة</div></div>
+    <div class="actions"><button class="secondary" onclick="event.stopPropagation();previewForm('${f.key}')">معاينة</button></div>
+  </div>`).join('');
+}
+function previewForm(key){
+  let form = null;
+  for(const cat of Object.keys(FORMS_LIBRARY)){
+    const f = FORMS_LIBRARY[cat].find(x=>x.key===key);
+    if(f){ form = f; break; }
+  }
+  if(!form) return;
+  currentFormPreview = form;
+  document.getElementById('forms-preview-title').textContent = form.title;
+  document.getElementById('forms-preview-content').innerHTML = form.content;
+  document.getElementById('forms-share-toolbar').innerHTML = shareToolbarHtml('getFormShareContent');
+  document.getElementById('forms-preview-card').style.display='block';
+  document.getElementById('forms-preview-card').scrollIntoView({behavior:'smooth'});
+}
+function getFormShareContent(){
+  if(!currentFormPreview) return null;
+  const el = document.createElement('div');
+  el.innerHTML = currentFormPreview.content;
+  return {title: currentFormPreview.title, html: currentFormPreview.content, text: el.innerText};
+}
+function openFormInEditor(){
+  if(!currentFormPreview) return;
+  showPageDirect('editor');
+  document.getElementById('editor-title').value = currentFormPreview.title;
+  document.getElementById('editor-area').innerHTML = currentFormPreview.content;
+  toast('تم فتح الصيغة في المحرر - يمكنك التعديل الآن');
+}
+</script>
+<script>
+// ============ DIRECTORY (Courts / Police / Prosecution) ============
+let currentDirectoryCategory = 'courts';
+const DIRECTORY_CATEGORY_LABEL = {courts:'محكمة', police:'قسم شرطة', prosecution:'نيابة'};
+const DIRECTORY_CATEGORY_ICON = {courts:'🏛️', police:'🚓', prosecution:'⚖️'};
+function setDirectoryCategory(cat){
+  currentDirectoryCategory = cat;
+  Object.keys(DIRECTORY_CATEGORY_LABEL).forEach(k=>{
+    document.getElementById('dir-tab-'+k).className = (k===cat) ? '' : 'secondary';
+  });
+  renderDirectory();
+}
+function openDirectoryModal(id){
+  document.getElementById('directory-id').value = id || '';
+  document.getElementById('directory-category').value = currentDirectoryCategory;
+  if(id){
+    const d = DB.directory.find(x=>x.id===id);
+    document.getElementById('directory-modal-title').textContent='تعديل بيانات الجهة';
+    document.getElementById('directory-name').value = d.name;
+    document.getElementById('directory-area').value = d.area || '';
+    document.getElementById('directory-address').value = d.address || '';
+    document.getElementById('directory-phone').value = d.phone || '';
+    document.getElementById('directory-email').value = d.email || '';
+    document.getElementById('directory-notes').value = d.notes || '';
+    document.getElementById('directory-category').value = d.category;
+  } else {
+    document.getElementById('directory-modal-title').textContent='إضافة جهة - ' + DIRECTORY_CATEGORY_LABEL[currentDirectoryCategory];
+    ['directory-name','directory-area','directory-address','directory-phone','directory-email','directory-notes'].forEach(f=>document.getElementById(f).value='');
+  }
+  document.getElementById('modal-directory').classList.add('open');
+}
+function saveDirectoryItem(){
+  const id = document.getElementById('directory-id').value;
+  const name = document.getElementById('directory-name').value.trim();
+  if(!name){ toast('من فضلك أدخل اسم الجهة'); return; }
+  const data = {
+    category: document.getElementById('directory-category').value,
+    name,
+    area: document.getElementById('directory-area').value.trim(),
+    address: document.getElementById('directory-address').value.trim(),
+    phone: document.getElementById('directory-phone').value.trim(),
+    email: document.getElementById('directory-email').value.trim(),
+    notes: document.getElementById('directory-notes').value.trim(),
+  };
+  if(id){
+    const d = DB.directory.find(x=>x.id===id);
+    Object.assign(d,data);
+    toast('تم تعديل بيانات الجهة');
+  } else {
+    DB.directory.push({id:uid(),...data,createdAt:Date.now()});
+    toast('تم إضافة الجهة');
+  }
+  save('directory');
+  closeModal('modal-directory');
+  renderDirectory();
+}
+function deleteDirectoryItem(id){
+  if(!confirm('هل تريد حذف هذه الجهة؟')) return;
+  DB.directory = DB.directory.filter(x=>x.id!==id);
+  save('directory');
+  renderDirectory();
+}
+function renderDirectory(){
+  Object.keys(DIRECTORY_CATEGORY_LABEL).forEach(k=>{
+    document.getElementById('dir-tab-'+k).className = (k===currentDirectoryCategory) ? '' : 'secondary';
+  });
+  const q = (document.getElementById('directory-search')?.value || '').trim().toLowerCase();
+  const list = document.getElementById('directory-list');
+  let items = DB.directory.filter(d=>d.category===currentDirectoryCategory);
+  if(q) items = items.filter(d=> d.name.toLowerCase().includes(q) || (d.area||'').toLowerCase().includes(q));
+  if(items.length===0){
+    list.innerHTML = `<div class="empty"><span class="icon">${DIRECTORY_CATEGORY_ICON[currentDirectoryCategory]}</span>لا توجد جهات مسجلة في ${DIRECTORY_CATEGORY_LABEL[currentDirectoryCategory]}.<br>اضغط "إضافة جهة جديدة" للبدء.</div>`;
+    return;
+  }
+  list.innerHTML = items.map(d=>`<div class="item directory-item">
+    <div class="icon-circle">${DIRECTORY_CATEGORY_ICON[d.category]}</div>
+    <div class="info">
+      <b>${escapeHtml(d.name)}</b>
+      ${d.area?`<div class="meta">📍 ${escapeHtml(d.area)}</div>`:''}
+      ${d.address?`<div class="meta">${escapeHtml(d.address)}</div>`:''}
+      ${d.phone?`<div class="meta">📞 ${escapeHtml(d.phone)}</div>`:''}
+      ${d.email?`<div class="meta">✉️ ${escapeHtml(d.email)}</div>`:''}
+      ${d.notes?`<div class="meta">${escapeHtml(d.notes)}</div>`:''}
+    </div>
+    <div class="actions">
+      <button class="secondary" onclick="openDirectoryModal('${d.id}')">تعديل</button>
+      <button class="danger" onclick="deleteDirectoryItem('${d.id}')">حذف</button>
+    </div>
+  </div>`).join('');
+}
+
+// ============ ELECTRONIC PORTALS (embedded iframes, internal only) ============
+const PORTALS = [
+  {key:'legislation', icon:'📜', name:'بوابة التشريعات', desc:'البوابة الوطنية للتشريعات المصرية'},
+  {key:'masr', icon:'🇪🇬', name:'منصة مصر الرقمية', desc:'بوابة الخدمات الحكومية المصرية'},
+  {key:'moj', icon:'⚖️', name:'وزارة العدل', desc:'موقع وزارة العدل المصرية'},
+  {key:'bar', icon:'👨‍⚖️', name:'نقابة المحامين', desc:'نقابة المحامين المصرية'},
+  {key:'econ_court', icon:'💼', name:'المحكمة الاقتصادية', desc:'بوابة المحاكم الاقتصادية الإلكترونية'},
+  {key:'efiling', icon:'🖥️', name:'التقاضي الإلكتروني', desc:'بوابة التقاضي الإلكتروني / إيداع الدعاوى'},
+  {key:'cassation', icon:'🏛️', name:'محكمة النقض', desc:'بوابة محكمة النقض المصرية'},
+  {key:'commercial_registry', icon:'📇', name:'السجل التجاري', desc:'بوابة السجل التجاري'},
+];
+function renderPortals(){
+  const list = document.getElementById('portals-list');
+  list.innerHTML = PORTALS.map(p=>{
+    const saved = DB.portalLinks[p.key];
+    return `<div class="item" onclick="${saved ? `openPortalViewer('${p.key}')` : `openPortalLinkModal('${p.key}')`}" style="cursor:pointer;">
+      <div class="icon-circle" style="font-size:20px;">${p.icon}</div>
+      <div class="info">
+        <b>${escapeHtml(p.name)}</b>
+        <div class="meta">${escapeHtml(p.desc)}</div>
+        <div class="meta">${saved ? '🟢 رابط محفوظ - اضغط للتشغيل' : '⚪ لم يتم إضافة رابط بعد'}</div>
+      </div>
+      <div class="actions">
+        <button class="secondary" onclick="event.stopPropagation();openPortalLinkModal('${p.key}')">${saved?'تغيير الرابط':'إضافة رابط'}</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function openPortalLinkModal(key){
+  const p = PORTALS.find(x=>x.key===key);
+  document.getElementById('portal-link-key').value = key;
+  document.getElementById('portal-link-title').textContent = 'رابط ' + (p?p.name:'البوابة');
+  document.getElementById('portal-link-url').value = DB.portalLinks[key] || '';
+  document.getElementById('modal-portal-link').classList.add('open');
+}
+function savePortalLink(){
+  const key = document.getElementById('portal-link-key').value;
+  const url = document.getElementById('portal-link-url').value.trim();
+  if(!url){ toast('من فضلك أدخل الرابط'); return; }
+  DB.portalLinks[key] = url;
+  save('portalLinks');
+  closeModal('modal-portal-link');
+  toast('تم حفظ الرابط');
+  renderPortals();
+  openPortalViewer(key);
+}
+function openPortalViewer(key){
+  const p = PORTALS.find(x=>x.key===key);
+  const url = DB.portalLinks[key];
+  document.querySelectorAll('.page').forEach(pg=>pg.classList.remove('active'));
+  document.getElementById('page-portal-viewer').classList.add('active');
+  document.getElementById('portal-viewer-title').textContent = (p?p.icon+' '+p.name:'البوابة');
+  const body = document.getElementById('portal-viewer-body');
+  if(!url){
+    body.innerHTML = `<div class="embed-placeholder"><span class="icon">🌐</span>لم يتم إضافة رابط لهذه البوابة بعد.
+      <div style="margin-top:10px;"><button onclick="openPortalLinkModal('${key}')">إضافة رابط</button></div></div>`;
+    return;
+  }
+  const resolved = resolveEmbed(url);
+  let html = renderEmbedHtml(resolved, 'embed-frame');
+  if(resolved.type==='iframe'){
+    html = html.replace(/(<iframe[^>]*src="[^"]*"[^>]*)>/, `$1 style="width:100%;height:60vh;border:none;border-radius:8px;">`);
+  }
+  body.innerHTML = html +
+    `<div style="margin-top:8px;"><button class="secondary full" onclick="openPortalLinkModal('${key}')">تغيير الرابط</button></div>`;
+}
+
+// ============ UNIVERSAL EMBED URL CONVERTER ============
+// ============ BING SEARCH BROWSER (full-page, isolated iframe) ============
+// Opens a dedicated full-page Bing search view. The page the user is
+// currently on is remembered so we can return to it, and the target
+// input field is remembered so the chosen URL is written back into it.
+let bingReturnPage = null;
+let bingTargetInputId = null;
+let bingHiddenModal = null;
+function openBingSearch(targetInputId, prefillQuery){
+  bingReturnPage = document.querySelector('.page.active')?.id?.replace('page-','') || 'home';
+  bingTargetInputId = targetInputId;
+  // Temporarily hide any open modal so the full-page Bing browser is visible
+  // (modals use a high z-index and would otherwise cover it). We restore
+  // it when the user returns.
+  bingHiddenModal = document.querySelector('.modal-bg.open');
+  if(bingHiddenModal) bingHiddenModal.style.display = 'none';
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-bing').classList.add('active');
+  const q = (prefillQuery||'').trim();
+  document.getElementById('bing-search-query').value = q;
+  document.getElementById('bing-current-url').value = '';
+  if(q) runBingSearch();
+  else document.getElementById('bing-frame').src = 'https://www.bing.com';
+}
+// Variant used for general info lookups (e.g. directory entries) where
+// there is no single URL field to fill - just opens the browser for
+// reference, "استخدام هذا الرابط" simply returns to the previous page.
+function openBingSearchInfo(prefillQuery){
+  openBingSearch(null, prefillQuery);
+}
+function runBingSearch(){
+  const q = document.getElementById('bing-search-query').value.trim();
+  if(!q){ toast('اكتب كلمات البحث أولاً'); return; }
+  document.getElementById('bing-frame').src = 'https://www.bing.com/search?q=' + encodeURIComponent(q);
+}
+function useBingCurrentUrl(){
+  const url = document.getElementById('bing-current-url').value.trim();
+  if(!url){ toast('الصق رابط الصفحة التي تريدها أولاً'); return; }
+  if(bingTargetInputId){
+    const input = document.getElementById(bingTargetInputId);
+    if(input) input.value = url;
+    toast('تم نسخ الرابط للحقل');
+  } else {
+    toast('تم - يمكنك استخدام هذا الرابط الآن');
+  }
+  returnFromBingSearch();
+}
+function copyBingCurrentUrl(){
+  const url = document.getElementById('bing-current-url').value.trim();
+  if(!url){ toast('لا يوجد رابط لنسخه'); return; }
+  navigator.clipboard.writeText(url).then(()=>toast('تم نسخ الرابط'));
+}
+function closeBingSearch(){
+  returnFromBingSearch();
+}
+function returnFromBingSearch(){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const target = bingReturnPage || 'home';
+  document.getElementById('page-'+target).classList.add('active');
+  callPageRenderer(target);
+  if(bingHiddenModal){ bingHiddenModal.style.display = ''; bingHiddenModal = null; }
+  bingReturnPage = null;
+  bingTargetInputId = null;
+}
+
+// Converts a pasted public URL (from YouTube, SoundCloud, Spotify, Mixcloud,
+// Facebook, Vimeo, Google Drive, or a direct audio/video file) into the
+// correct *embeddable* URL + the type of player to render.
+// Returns: {type:'audio'|'video'|'iframe'|'unknown', src:'...'}
+function resolveEmbed(rawUrl){
+  const url = (rawUrl||'').trim();
+  if(!url) return {type:'empty', src:''};
+
+  // 0) Plain text (not a URL) - e.g. user typed a station/topic name instead
+  // of pasting a link. Bing allows its search-results page to be embedded
+  // in an iframe (unlike Google), so we can show live, interactive search
+  // results directly inside the app - the user can click any result link
+  // inside the embedded results to navigate/play within the same frame.
+  if(!/^https?:\/\//i.test(url) && !/^[a-z0-9.-]+\.[a-z]{2,}/i.test(url)){
+    return {type:'bing_search', src:`https://www.bing.com/search?q=${encodeURIComponent(url)}`, query:url};
+  }
+
+  // 1) Direct audio/video file (mp3, m3u8, mp4, etc.)
+  if(/\.(mp3|aac|ogg|wav|flac|opus|m4a)(\?.*)?$/i.test(url)){
+    return {type:'audio', src:url};
+  }
+  if(/\.(m3u8|m3u|pls)(\?.*)?$/i.test(url)){
+    return {type:'audio', src:url};
+  }
+  if(/\.(mp4|webm|ogv)(\?.*)?$/i.test(url)){
+    return {type:'video', src:url};
+  }
+
+  try{
+    const u = new URL(url);
+    const host = u.hostname.replace(/^www\./,'').replace(/^m\./,'');
+
+    // 2) YouTube (watch, youtu.be, shorts, live, embed, playlist)
+    if(host==='youtube.com' || host==='youtube-nocookie.com' || host==='youtu.be' || host==='music.youtube.com'){
+      let videoId = '';
+      let listId = u.searchParams.get('list');
+      if(host==='youtu.be'){
+        videoId = u.pathname.slice(1).split('/')[0];
+      } else if(u.pathname.startsWith('/watch')){
+        videoId = u.searchParams.get('v') || '';
+      } else if(u.pathname.startsWith('/embed/')){
+        videoId = u.pathname.split('/')[2] || '';
+      } else if(u.pathname.startsWith('/shorts/')){
+        videoId = u.pathname.split('/')[2] || '';
+      } else if(u.pathname.startsWith('/live/')){
+        videoId = u.pathname.split('/')[2] || '';
+      }
+      if(videoId){
+        return {type:'iframe', src:`https://www.youtube-nocookie.com/embed/${videoId}${listId?`?list=${listId}`:''}`, allow:'autoplay; encrypted-media; picture-in-picture; fullscreen'};
+      }
+      if(listId){
+        return {type:'iframe', src:`https://www.youtube-nocookie.com/embed/videoseries?list=${listId}`, allow:'autoplay; encrypted-media; picture-in-picture; fullscreen'};
+      }
+      if(u.pathname.startsWith('/channel/') || u.pathname.startsWith('/@') || u.pathname.startsWith('/c/')){
+        // Channel pages cannot be embedded directly by YouTube.
+        return {type:'unsupported', src:url, reason:'صفحات القنوات على يوتيوب لا يمكن تضمينها مباشرة - فقط روابط فيديوهات أو قوائم تشغيل محددة.'};
+      }
+    }
+
+    // 3) SoundCloud — needs their oEmbed-style embed widget URL
+    if(host==='soundcloud.com'){
+      const encoded = encodeURIComponent(url);
+      return {type:'iframe', src:`https://w.soundcloud.com/player/?url=${encoded}&color=%23d4af37&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&visual=false`, allow:'autoplay'};
+    }
+
+    // 4) Spotify (track/episode/playlist/show/artist/album)
+    if(host==='open.spotify.com'){
+      const parts = u.pathname.split('/').filter(Boolean); // [type, id]
+      if(parts.length>=2){
+        return {type:'iframe', src:`https://open.spotify.com/embed/${parts[0]}/${parts[1]}`, allow:'autoplay; encrypted-media; fullscreen'};
+      }
+    }
+
+    // 5) Mixcloud
+    if(host==='mixcloud.com'){
+      const feedPath = encodeURIComponent(u.pathname);
+      return {type:'iframe', src:`https://www.mixcloud.com/widget/iframe/?feed=${feedPath}&hide_cover=1&light=0`, allow:'autoplay'};
+    }
+
+    // 6) Vimeo
+    if(host==='vimeo.com'){
+      const id = u.pathname.split('/').filter(Boolean)[0];
+      if(id && /^\d+$/.test(id)){
+        return {type:'iframe', src:`https://player.vimeo.com/video/${id}`, allow:'autoplay; fullscreen; picture-in-picture'};
+      }
+    }
+
+    // 7) Facebook video
+    if(host==='facebook.com' || host==='fb.watch'){
+      const encoded = encodeURIComponent(url);
+      return {type:'iframe', src:`https://www.facebook.com/plugins/video.php?href=${encoded}&show_text=false&autoplay=false`, allow:'autoplay; encrypted-media; fullscreen'};
+    }
+
+    // 8) Google Drive (file preview)
+    if(host==='drive.google.com'){
+      const m = u.pathname.match(/\/file\/d\/([^/]+)/);
+      if(m){
+        return {type:'iframe', src:`https://drive.google.com/file/d/${m[1]}/preview`, allow:'autoplay'};
+      }
+    }
+
+    // 9) Telegram public post / channel embed
+    if(host==='t.me'){
+      return {type:'iframe', src: url + (url.includes('?')?'&':'?') + 'embed=1', allow:''};
+    }
+
+    // 10) Already an /embed/ style URL from any provider - use as-is
+    if(u.pathname.includes('/embed') || u.pathname.includes('/player')){
+      return {type:'iframe', src:url, allow:'autoplay; encrypted-media; fullscreen'};
+    }
+
+  }catch(e){
+    return {type:'unsupported', src:url, reason:'الرابط غير صالح.'};
+  }
+
+  // 11) Unknown/general page — attempt a generic iframe but warn it may be blocked.
+  return {type:'iframe_generic', src:url, allow:'autoplay; encrypted-media; fullscreen'};
+}
+
+// Radio-specific resolver: same platform detection as resolveEmbed(), but
+// any URL that isn't a recognized video/social platform is treated as a
+// direct audio stream (most radio station URLs have no file extension,
+// e.g. Shoutcast/Icecast streams like https://stream.example.com/live).
+function resolveRadioEmbed(rawUrl){
+  const url = (rawUrl||'').trim();
+  if(!url) return {type:'empty', src:''};
+  const resolved = resolveEmbed(url);
+  // Platform-specific players (YouTube/SoundCloud/Spotify/etc.) and Bing
+  // search results keep their iframe.
+  if(resolved.type==='iframe' || resolved.type==='video' || resolved.type==='unsupported' || resolved.type==='bing_search'){
+    return resolved;
+  }
+  // Anything else (audio file, .pls/.m3u8, or a plain stream URL with no
+  // recognizable extension) — play as audio.
+  if(resolved.type==='audio') return resolved;
+  return {type:'audio', src:url};
+}
+
+// Renders the HTML for a resolved embed result, given a container size class.
+function renderEmbedHtml(resolved, sizeClass){
+  const sizeAttr = sizeClass ? ` class="${sizeClass}"` : '';
+  switch(resolved.type){
+    case 'audio':
+      return `<audio controls preload="none" style="width:100%;">
+          <source src="${escapeHtml(resolved.src)}">
+        </audio>`;
+    case 'video':
+      return `<video controls preload="none" style="width:100%;border-radius:8px;background:#000;">
+          <source src="${escapeHtml(resolved.src)}">
+        </video>`;
+    case 'iframe':
+      return `<iframe${sizeAttr} src="${escapeHtml(resolved.src)}" allow="${escapeHtml(resolved.allow||'')}" loading="lazy" referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin allow-popups allow-presentation"></iframe>`;
+    case 'bing_search':
+      return `<iframe${sizeAttr} src="${escapeHtml(resolved.src)}" allow="autoplay; encrypted-media; fullscreen" loading="lazy" referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-presentation allow-top-navigation-by-user-activation" style="width:100%;height:50vh;border:none;border-radius:8px;background:#fff;"></iframe>
+        <div style="font-size:11px;color:var(--text-dim);margin-top:6px;">
+          🔎 نتائج بحث Bing عن "${escapeHtml(resolved.query||'')}" - يمكنك التصفح والضغط على أي رابط نتيجة لتشغيله مباشرة هنا.
+        </div>`;
+    case 'iframe_generic':
+      return `<iframe${sizeAttr} src="${escapeHtml(resolved.src)}" allow="${escapeHtml(resolved.allow||'')}" loading="lazy" referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-presentation"></iframe>
+        <div style="font-size:11px;color:var(--text-dim);margin-top:6px;">
+          💡 إذا ظهرت "صفحة الويب غير متاحة"، فالموقع المصدر يمنع التضمين (Embed) من جانبه. هذه الروابط تعمل بشكل مباشر وموثوق:
+          يوتيوب (فيديو/قائمة)، ساوند كلاود، سبوتيفاي، Mixcloud، فيميو، أو رابط بث صوتي مباشر (.mp3/.m3u8/.aac).
+        </div>`;
+    case 'unsupported':
+      return `<div class="embed-placeholder"><span class="icon">⚠️</span>${escapeHtml(resolved.reason||'هذا الرابط غير مدعوم للتضمين.')}</div>`;
+    default:
+      return `<div class="embed-placeholder"><span class="icon">📻</span>رابط غير صالح.</div>`;
+  }
+}
+
+// ============ SPIRITUAL RADIO (5 fixed embed slots, no popups) ============
+function renderRadio(){
+  const list = document.getElementById('radio-list');
+  if(!list){
+    console.error('renderRadio: #radio-list element not found in DOM');
+    return;
+  }
+  let html = '';
+  for(let i=1;i<=5;i++){
+    const key = 'radio'+i;
+    const station = DB.radioLinks[key];
+    let stationHtml = `<div class="radio-player">
+      <div class="station-name">📻 ${station && station.name ? escapeHtml(station.name) : 'محطة '+i}</div>`;
+    if(station && station.url){
+      const resolved = resolveRadioEmbed(station.url);
+      if(resolved.type==='audio'){
+        // Native audio player - most reliable for radio streams (mp3/aac/icecast/shoutcast/m3u8...)
+        stationHtml += `
+          <audio id="audio-${key}" controls preload="none" style="width:100%;">
+            <source src="${escapeHtml(resolved.src)}">
+            متصفحك لا يدعم تشغيل الصوت.
+          </audio>
+          <div style="margin-top:6px;">
+            <button class="full" onclick="playRadioStream('${key}')">▶️ تشغيل البث</button>
+          </div>
+          <div style="font-size:11px;color:var(--text-dim);margin-top:6px;">
+            إذا لم يبدأ التشغيل، اضغط زر "تشغيل البث" أعلاه (بعض المتصفحات تتطلب ضغطة المستخدم لبدء الصوت).
+          </div>`;
+      } else if(resolved.type==='bing_search'){
+        stationHtml += renderEmbedHtml(resolved, '');
+      } else if(resolved.type==='iframe' || resolved.type==='iframe_generic'){
+        const sandboxAttr = resolved.type==='iframe_generic' ? 'allow-scripts allow-same-origin allow-popups allow-forms allow-presentation' : 'allow-scripts allow-same-origin allow-popups allow-presentation';
+        stationHtml += `<iframe src="${escapeHtml(resolved.src)}" allow="${escapeHtml(resolved.allow||'')}" loading="lazy" referrerpolicy="no-referrer" sandbox="${sandboxAttr}" style="width:100%;height:160px;border:none;border-radius:8px;"></iframe>`;
+        if(resolved.type==='iframe_generic'){
+          stationHtml += `<div style="font-size:11px;color:var(--text-dim);margin-top:6px;">
+              💡 إذا ظهرت "صفحة الويب غير متاحة"، فالموقع المصدر يمنع التضمين من جانبه. الصق رابط بث مباشر للمحطة (.mp3/.m3u8/.aac أو رابط Shoutcast/Icecast) لتشغيله كصوت مباشرة.
+            </div>`;
+        }
+      } else if(resolved.type==='unsupported'){
+        stationHtml += `<div class="embed-placeholder"><span class="icon">⚠️</span>${escapeHtml(resolved.reason||'هذا الرابط غير مدعوم.')}</div>`;
+      }
+      stationHtml += `<div style="margin-top:8px;display:flex;gap:8px;">
+          <button class="secondary full" onclick="openRadioLinkModal('${key}')">تغيير الرابط</button>
+        </div>`;
+      stationHtml += `<div style="margin-top:6px;display:flex;gap:8px;">
+          <button class="secondary radio-action-btn" style="flex:1;" data-action="copy" data-key="${key}">📋 نسخ الرابط</button>
+          <button class="secondary radio-action-btn" style="flex:1;" data-action="whatsapp" data-key="${key}">📱 إرسال واتساب</button>
+          <button class="secondary radio-action-btn" style="flex:1;" data-action="telegram" data-key="${key}">✈️ تليجرام</button>
+        </div>`;
+      stationHtml += `<div style="margin-top:6px;">
+          <button class="danger radio-action-btn" style="width:100%;" data-action="reset" data-key="${key}">🗑️ إعادة تعيين هذه المحطة (حذف الرابط المحفوظ)</button>
+        </div>`;
+    } else {
+      stationHtml += `<div class="embed-placeholder"><span class="icon">📻</span>لم يتم إضافة رابط لهذه المحطة بعد.
+        <div style="margin-top:10px;"><button onclick="openRadioLinkModal('${key}')">إضافة رابط</button></div></div>`;
+    }
+    stationHtml += `</div>`;
+    html += stationHtml;
+  }
+  list.innerHTML = html;
+  // Delegated click handler for copy/whatsapp/telegram buttons (safer than
+  // inlining station names/URLs into onclick attributes, which can break
+  // HTML parsing if they contain quote characters).
+  list.querySelectorAll('.radio-action-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const key = btn.getAttribute('data-key');
+      const action = btn.getAttribute('data-action');
+      const station = DB.radioLinks[key];
+      if(!station) return;
+      const name = station.name || key;
+      if(action==='copy') universalCopy(station.url);
+      else if(action==='whatsapp') universalShare('whatsapp', name, station.url);
+      else if(action==='telegram') universalShare('telegram', name, station.url);
+      else if(action==='reset'){
+        if(!confirm('هل تريد حذف الرابط المحفوظ لهذه المحطة وإعادتها لوضعها الأصلي؟')) return;
+        delete DB.radioLinks[key];
+        save('radioLinks');
+        toast('تم إعادة تعيين المحطة');
+        renderRadio();
+      }
+    });
+  });
+}
+// Explicit user-gesture play (helps on mobile browsers that block autoplay).
+function playRadioStream(key){
+  const audio = document.getElementById('audio-'+key);
+  if(!audio) return;
+  audio.play().catch(()=>{
+    toast('تعذر تشغيل البث - تأكد أن الرابط يعمل أو جرّب رابطاً آخر');
+  });
+}
+function openRadioLinkModal(key){
+  const station = DB.radioLinks[key] || {};
+  document.getElementById('radio-link-key').value = key;
+  document.getElementById('radio-link-title').textContent = 'رابط ' + (station.name || key.replace('radio','محطة '));
+  document.getElementById('radio-link-name').value = station.name || '';
+  document.getElementById('radio-link-url').value = station.url || '';
+  document.getElementById('modal-radio-link').classList.add('open');
+}
+function saveRadioLink(){
+  const key = document.getElementById('radio-link-key').value;
+  const url = document.getElementById('radio-link-url').value.trim();
+  const name = document.getElementById('radio-link-name').value.trim();
+  if(!url){ toast('من فضلك أدخل الرابط'); return; }
+  DB.radioLinks[key] = {name: name || key, url};
+  save('radioLinks');
+  closeModal('modal-radio-link');
+  toast('تم حفظ الرابط وتشغيل المحطة');
+  renderRadio();
+}
+
+// ============ INITIAL RENDER ============
+renderHome();
+</script>
+</body>
+</html>
