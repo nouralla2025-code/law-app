@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0e0c09">
+<title>مستكشف GitHub - دعم المحامي</title>
+<style>
+  :root{
+    --bg:#0e0c09; --card:#171310; --border:#3a2f1f; --gold:#d4af37; --gold-light:#e8c96a;
+    --text:#f0e6d2; --text-dim:#a89878; --success:#3fae5a; --danger:#c0392b; --info:#3b82f6;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:'Segoe UI',Tahoma,Arial,sans-serif; background:var(--bg); color:var(--text);
+    padding-bottom:30px;
+  }
+  header{
+    text-align:center; padding:22px 16px 14px; border-bottom:2px solid var(--gold);
+    background:linear-gradient(180deg,#1a1510,#0e0c09);
+  }
+  header h1{margin:0; color:var(--gold); font-size:22px;}
+  header p{margin:6px 0 0; color:var(--text-dim); font-size:12px;}
+  .wrap{max-width:720px; margin:0 auto; padding:14px;}
+  .card{
+    background:var(--card); border:1px solid var(--border); border-radius:12px; padding:14px; margin-bottom:14px;
+  }
+  label{display:block; font-size:13px; color:var(--gold-light); margin:8px 0 4px;}
+  input[type=text], input[type=url]{
+    width:100%; padding:11px; border-radius:8px; border:1px solid var(--border);
+    background:#0e0c09; color:var(--text); font-size:14px; margin-bottom:8px;
+  }
+  button{
+    background:linear-gradient(180deg,var(--gold-light),var(--gold)); color:#1a1408; border:none;
+    border-radius:8px; padding:11px 16px; font-weight:bold; font-size:14px; cursor:pointer; width:100%;
+  }
+  button.secondary{background:#241d14; color:var(--gold-light); border:1px solid var(--gold);}
+  button.small{width:auto; padding:7px 12px; font-size:12px;}
+  .tabs-row{display:flex; gap:8px; margin-top:8px;}
+  .tabs-row > *{flex:1;}
+  .item{
+    display:flex; justify-content:space-between; align-items:center; gap:8px;
+    padding:10px; border-bottom:1px solid var(--border);
+  }
+  .item:last-child{border-bottom:none;}
+  .item .name{font-size:13px; word-break:break-all;}
+  .item .icon{margin-left:6px;}
+  .badge{
+    display:inline-block; padding:2px 8px; border-radius:20px; font-size:10px; margin-right:4px;
+  }
+  .badge.html{background:rgba(63,174,90,.18); color:var(--success);}
+  .badge.code{background:rgba(59,130,246,.18); color:var(--info);}
+  .badge.other{background:rgba(168,152,120,.18); color:var(--text-dim);}
+  .badge.dir{background:rgba(212,175,55,.18); color:var(--gold-light);}
+  .empty{text-align:center; padding:30px 10px; color:var(--text-dim); font-size:13px;}
+  .empty .icon{font-size:40px; display:block; margin-bottom:8px;}
+  #viewer-wrap{display:none;}
+  #viewer-frame{width:100%; height:70vh; border:none; border-radius:8px; background:#fff;}
+  .note{font-size:11px; color:var(--text-dim); line-height:1.8; margin-top:8px;}
+  .crumb{font-size:12px; color:var(--text-dim); margin-bottom:8px;}
+  .crumb span{color:var(--gold-light); cursor:pointer;}
+  .loading{text-align:center; padding:20px; color:var(--gold-light);}
+  .err{background:rgba(192,57,43,.15); border:1px solid var(--danger); color:#e8a39a; padding:10px; border-radius:8px; font-size:13px; margin-top:8px;}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🔍 مستكشف GitHub</h1>
+  <p>الصق رابط أي مستودع GitHub لاستعراض ملفاته، تحميلها، أو تشغيل ملفات HTML مباشرة هنا</p>
+  <p style="margin-top:8px;color:var(--gold-light);">📲 لتسهيل الاستخدام: افتح قائمة المتصفح (⋮) واختر "إضافة إلى الشاشة الرئيسية" لتثبيتها كأيقونة منفصلة</p>
+</header>
+
+<div class="wrap">
+
+  <div class="card">
+    <label>رابط المستودع (مثال: github.com/username/repo)</label>
+    <input type="text" id="repo-url" placeholder="https://github.com/username/repo-name">
+    <button onclick="loadRepo()">📂 استكشاف المستودع</button>
+    <div class="note">
+      💡 يمكنك أيضاً لصق رابط مجلد فرعي أو ملف مباشرة من داخل المستودع - ستبدأ من نفس المكان.
+    </div>
+  </div>
+
+  <div id="status-area"></div>
+
+  <div class="card" id="browser-card" style="display:none;">
+    <div class="crumb" id="breadcrumb"></div>
+    <div id="file-list"></div>
+  </div>
+
+  <div class="card" id="viewer-wrap">
+    <div class="tabs-row" style="margin-bottom:8px;">
+      <button class="secondary small" onclick="closeViewer()">✖ إغلاق المعاينة</button>
+      <button class="secondary small" onclick="downloadCurrentFile()">⬇ تحميل الملف</button>
+      <button class="secondary small" onclick="openInNewWindow()">↗ فتح في نافذة كاملة</button>
+    </div>
+    <iframe id="viewer-frame" src="about:blank"></iframe>
+  </div>
+
+</div>
+
+<script>
+let currentOwner = '', currentRepo = '', currentBranch = 'main', currentPath = '';
+let currentViewerUrl = '';
+
+function parseGithubUrl(url){
+  // Accepts virtually any GitHub URL shape the user might paste, including:
+  // github.com/owner/repo
+  // github.com/owner/repo.git
+  // github.com/owner/repo/tree/branch/path
+  // github.com/owner/repo/blob/branch/path/file.html
+  // raw.githubusercontent.com/owner/repo/branch/path
+  // with or without https://, with or without trailing slash/whitespace.
+  try{
+    let cleaned = url.trim();
+    if(!cleaned) return null;
+    if(!/^https?:\/\//i.test(cleaned)) cleaned = 'https://' + cleaned;
+    const u = new URL(cleaned);
+    let parts = u.pathname.split('/').filter(Boolean);
+    if(parts.length < 2) return null;
+
+    // raw.githubusercontent.com/owner/repo/branch/path...
+    if(u.hostname.includes('raw.githubusercontent.com')){
+      const owner = parts[0], repo = parts[1], branch = parts[2] || 'main';
+      const path = parts.slice(3).join('/');
+      return { owner, repo, branch, path };
+    }
+
+    // Standard github.com/owner/repo[.git][/tree|blob/branch/path...]
+    let owner = parts[0];
+    let repo = parts[1].replace(/\.git$/i, '');
+    let branch = 'main', path = '';
+    if(parts.length > 3 && (parts[2] === 'tree' || parts[2] === 'blob')){
+      branch = parts[3];
+      path = parts.slice(4).join('/');
+    }
+    return { owner, repo, branch, path };
+  } catch(e){ return null; }
+}
+
+async function loadRepo(){
+  const raw = document.getElementById('repo-url').value.trim();
+  if(!raw){ showError('الصق رابط مستودع GitHub أولاً'); return; }
+  const parsed = parseGithubUrl(raw);
+  if(!parsed){ showError('رابط غير صالح. تأكد أنه رابط GitHub صحيح مثل: github.com/owner/repo'); return; }
+  currentOwner = parsed.owner;
+  currentRepo = parsed.repo;
+  currentPath = parsed.path || '';
+  document.getElementById('status-area').innerHTML = '<div class="loading">⏳ جاري التحميل...</div>';
+
+  // Try to detect default branch first (main vs master) via GitHub API.
+  try{
+    const repoInfoResp = await fetch(`https://api.github.com/repos/${currentOwner}/${currentRepo}`);
+    if(repoInfoResp.ok){
+      const info = await repoInfoResp.json();
+      currentBranch = parsed.branch !== 'main' ? parsed.branch : (info.default_branch || 'main');
+    } else {
+      currentBranch = parsed.branch || 'main';
+    }
+  } catch(e){
+    currentBranch = parsed.branch || 'main';
+  }
+
+  await browsePath(currentPath);
+}
+
+async function browsePath(path){
+  currentPath = path || '';
+  document.getElementById('status-area').innerHTML = '<div class="loading">⏳ جاري التحميل...</div>';
+  document.getElementById('browser-card').style.display = 'none';
+  closeViewer();
+
+  const apiUrl = `https://api.github.com/repos/${currentOwner}/${currentRepo}/contents/${currentPath}`;
+  try{
+    const resp = await fetch(apiUrl);
+    if(!resp.ok){
+      if(resp.status === 404){ showError('لم يتم العثور على هذا المسار. تأكد من صحة الرابط أو الفرع (Branch).'); }
+      else if(resp.status === 403){ showError('تم تجاوز الحد المسموح من طلبات GitHub المجانية مؤقتاً. حاول بعد دقيقة.'); }
+      else { showError('تعذر تحميل المستودع (خطأ ' + resp.status + ').'); }
+      return;
+    }
+    const data = await resp.json();
+    document.getElementById('status-area').innerHTML = '';
+    renderBrowser(data);
+  } catch(e){
+    showError('تعذر الاتصال بـ GitHub. السبب التقني: ' + (e.message || e.name || 'غير معروف') + '. إذا استمر الخطأ، جرّب فتح هذا الملف من رابط مباشر (GitHub Pages) بدل المعاينة.');
+  }
+}
+
+function showError(msg){
+  document.getElementById('status-area').innerHTML = `<div class="err">⚠️ ${escapeHtml(msg)}</div>`;
+}
+
+function escapeHtml(s){
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+function classifyFile(name){
+  const ext = (name.split('.').pop() || '').toLowerCase();
+  if(['html','htm'].includes(ext)) return {cls:'html', icon:'🌐', label:'HTML'};
+  if(['js','jsx','ts','tsx','py','java','kt','swift','c','cpp','json','xml','gradle'].includes(ext)) return {cls:'code', icon:'💻', label:'كود'};
+  if(['png','jpg','jpeg','gif','svg','webp'].includes(ext)) return {cls:'other', icon:'🖼️', label:'صورة'};
+  if(['apk'].includes(ext)) return {cls:'other', icon:'📱', label:'APK'};
+  if(['zip','rar','7z'].includes(ext)) return {cls:'other', icon:'🗜️', label:'أرشيف'};
+  if(['pdf'].includes(ext)) return {cls:'other', icon:'📄', label:'PDF'};
+  if(['md'].includes(ext)) return {cls:'other', icon:'📝', label:'نص'};
+  return {cls:'other', icon:'📄', label:ext.toUpperCase()||'ملف'};
+}
+
+function renderBrowser(items){
+  document.getElementById('browser-card').style.display = 'block';
+  // Breadcrumb
+  const segments = currentPath ? currentPath.split('/') : [];
+  let crumbHtml = `<span onclick="browsePath('')">📦 ${escapeHtml(currentRepo)}</span>`;
+  let acc = '';
+  segments.forEach(seg=>{
+    acc += (acc?'/':'') + seg;
+    const accCopy = acc;
+    crumbHtml += ` / <span onclick="browsePath('${escapeHtml(accCopy)}')">${escapeHtml(seg)}</span>`;
+  });
+  document.getElementById('breadcrumb').innerHTML = crumbHtml;
+
+  const list = Array.isArray(items) ? items : [items];
+  if(list.length === 0){
+    document.getElementById('file-list').innerHTML = `<div class="empty"><span class="icon">📭</span>هذا المجلد فارغ.</div>`;
+    return;
+  }
+  // Folders first, then files
+  list.sort((a,b)=>{
+    if(a.type !== b.type) return a.type === 'dir' ? -1 : 1;
+    return a.name.localeCompare(b.name);
+  });
+
+  document.getElementById('file-list').innerHTML = list.map(item=>{
+    if(item.type === 'dir'){
+      return `<div class="item">
+        <div class="name">📁 ${escapeHtml(item.name)} <span class="badge dir">مجلد</span></div>
+        <button class="secondary small" onclick="browsePath('${escapeHtml(item.path)}')">فتح</button>
+      </div>`;
+    }
+    const info = classifyFile(item.name);
+    const sizeKb = item.size ? (item.size/1024).toFixed(1)+' KB' : '';
+    const rawUrl = `https://cdn.jsdelivr.net/gh/${currentOwner}/${currentRepo}@${currentBranch}/${item.path}`;
+    const downloadUrl = item.download_url || rawUrl;
+    let actionBtn = '';
+    if(info.cls === 'html'){
+      actionBtn = `<button class="small" onclick="previewHtml('${escapeHtml(rawUrl)}','${escapeHtml(item.name)}')">▶ تشغيل</button>`;
+    } else {
+      actionBtn = `<button class="secondary small" onclick="downloadFile('${escapeHtml(downloadUrl)}','${escapeHtml(item.name)}')">⬇ تحميل</button>`;
+    }
+    return `<div class="item">
+      <div class="name">${info.icon} ${escapeHtml(item.name)} <span class="badge ${info.cls}">${info.label}</span> <span style="color:var(--text-dim);font-size:10px;">${sizeKb}</span></div>
+      ${actionBtn}
+    </div>`;
+  }).join('');
+}
+
+function previewHtml(url, name){
+  currentViewerUrl = url;
+  document.getElementById('viewer-wrap').style.display = 'block';
+  document.getElementById('viewer-frame').src = url;
+  document.getElementById('viewer-wrap').scrollIntoView({behavior:'smooth'});
+}
+function closeViewer(){
+  document.getElementById('viewer-wrap').style.display = 'none';
+  document.getElementById('viewer-frame').src = 'about:blank';
+  currentViewerUrl = '';
+}
+function openInNewWindow(){
+  if(currentViewerUrl) window.open(currentViewerUrl, '_blank');
+}
+function downloadCurrentFile(){
+  if(currentViewerUrl){
+    const a = document.createElement('a');
+    a.href = currentViewerUrl;
+    a.download = '';
+    a.target = '_blank';
+    a.click();
+  }
+}
+function downloadFile(url, name){
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = name;
+  a.target = '_blank';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+}
+</script>
+</body>
+</html>
