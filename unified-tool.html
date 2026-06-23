@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الأداة الموحدة — أفكار + مبيعات</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap');
+
+  :root {
+    --ink:    #1a1a2e;
+    --gold:   #c9a84c;
+    --gold2:  #f0d080;
+    --cream:  #fdf6e3;
+    --glass:  rgba(255,255,255,0.07);
+    --border: rgba(201,168,76,0.25);
+    --r:      14px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Cairo', sans-serif;
+    background: var(--ink);
+    color: #e8e0cc;
+    min-height: 100vh;
+    padding-bottom: 40px;
+  }
+
+  /* ═══ HEADER ═══ */
+  header {
+    background: linear-gradient(135deg, #0f0f1e 0%, #1a1a2e 60%, #0d1b3e 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 18px 16px 14px;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  header h1 {
+    font-size: 1.25rem;
+    font-weight: 900;
+    background: linear-gradient(90deg, var(--gold), var(--gold2), var(--gold));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 0.5px;
+  }
+  header p { font-size: 0.72rem; color: #8899aa; margin-top: 3px; }
+
+  /* ═══ TABS ═══ */
+  .tabs {
+    display: flex;
+    margin: 14px 14px 0;
+    background: rgba(255,255,255,0.04);
+    border-radius: var(--r);
+    padding: 4px;
+    gap: 4px;
+  }
+  .tab {
+    flex: 1;
+    padding: 10px 6px;
+    border: none;
+    border-radius: 10px;
+    background: transparent;
+    color: #7788aa;
+    font-family: 'Cairo', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all .25s;
+  }
+  .tab.active {
+    background: linear-gradient(135deg, #c9a84c, #a07830);
+    color: #fff;
+    box-shadow: 0 2px 12px rgba(201,168,76,.35);
+  }
+
+  /* ═══ SECTIONS ═══ */
+  .section { display: none; padding: 14px; animation: fadeUp .3s ease; }
+  .section.active { display: block; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ═══ API KEY CARD ═══ */
+  .key-card {
+    background: rgba(201,168,76,.08);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 14px;
+    margin-bottom: 16px;
+  }
+  .key-card label { font-size: 0.78rem; color: var(--gold); font-weight: 700; display: block; margin-bottom: 7px; }
+  .key-row { display: flex; gap: 8px; }
+  .key-row input {
+    flex: 1;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 12px;
+    color: #e8e0cc;
+    font-family: 'Cairo', sans-serif;
+    font-size: 0.8rem;
+    direction: ltr;
+  }
+  .key-row input:focus { outline: none; border-color: var(--gold); }
+  .save-key {
+    background: var(--gold);
+    border: none;
+    border-radius: 8px;
+    padding: 9px 14px;
+    color: #1a1a2e;
+    font-family: 'Cairo', sans-serif;
+    font-weight: 700;
+    font-size: 0.8rem;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .key-status { font-size: 0.72rem; margin-top: 6px; color: #8899aa; }
+  .key-status.ok { color: #5dbb7a; }
+
+  /* ═══ CARD ═══ */
+  .card {
+    background: var(--glass);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 16px;
+    margin-bottom: 14px;
+  }
+  .card-title {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--gold);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* ═══ FORM ELEMENTS ═══ */
+  .field { margin-bottom: 12px; }
+  .field label { font-size: 0.78rem; color: #aabbcc; display: block; margin-bottom: 5px; font-weight: 600; }
+  .field select,
+  .field input,
+  .field textarea {
+    width: 100%;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    color: #e8e0cc;
+    font-family: 'Cairo', sans-serif;
+    font-size: 0.85rem;
+  }
+  .field select:focus,
+  .field input:focus,
+  .field textarea:focus { outline: none; border-color: var(--gold); }
+  .field textarea { resize: vertical; min-height: 80px; }
+  .field select option { background: #1a1a2e; }
+
+  /* ═══ CHIPS ═══ */
+  .chips { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 12px; }
+  .chip {
+    padding: 6px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.04);
+    color: #aabbcc;
+    font-size: 0.75rem;
+    font-family: 'Cairo', sans-serif;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .chip.selected {
+    background: rgba(201,168,76,.2);
+    border-color: var(--gold);
+    color: var(--gold2);
+  }
+
+  /* ═══ BUTTON ═══ */
+  .btn-main {
+    width: 100%;
+    padding: 13px;
+    background: linear-gradient(135deg, #c9a84c, #a07830);
+    border: none;
+    border-radius: var(--r);
+    color: #fff;
+    font-family: 'Cairo', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 900;
+    cursor: pointer;
+    transition: opacity .2s, transform .15s;
+    letter-spacing: 0.5px;
+  }
+  .btn-main:active { opacity: .85; transform: scale(.98); }
+  .btn-main:disabled { opacity: .5; cursor: not-allowed; }
+  .btn-sec {
+    padding: 8px 16px;
+    background: rgba(201,168,76,.15);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--gold2);
+    font-family: 'Cairo', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background .2s;
+  }
+  .btn-sec:hover { background: rgba(201,168,76,.25); }
+
+  /* ═══ LOADER ═══ */
+  .loader {
+    display: none;
+    text-align: center;
+    padding: 24px;
+    color: var(--gold);
+    font-size: 0.82rem;
+  }
+  .loader.show { display: block; }
+  .dots span {
+    display: inline-block;
+    width: 8px; height: 8px;
+    margin: 0 3px;
+    border-radius: 50%;
+    background: var(--gold);
+    animation: bounce .9s infinite;
+  }
+  .dots span:nth-child(2) { animation-delay: .15s; }
+  .dots span:nth-child(3) { animation-delay: .3s; }
+  @keyframes bounce {
+    0%,80%,100% { transform: translateY(0); opacity:.4; }
+    40% { transform: translateY(-8px); opacity:1; }
+  }
+
+  /* ═══ RESULT CARDS ═══ */
+  .results { margin-top: 14px; }
+  .idea-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(201,168,76,.2);
+    border-radius: var(--r);
+    padding: 14px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: all .2s;
+    position: relative;
+  }
+  .idea-card:hover, .idea-card:active {
+    border-color: var(--gold);
+    background: rgba(201,168,76,.08);
+  }
+  .idea-card .idea-num {
+    position: absolute;
+    top: 10px;
+    left: 12px;
+    font-size: 0.7rem;
+    color: var(--gold);
+    font-weight: 900;
+  }
+  .idea-card .idea-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--gold2);
+    margin-bottom: 5px;
+    padding-left: 32px;
+  }
+  .idea-card .idea-body { font-size: 0.78rem; color: #aabbcc; line-height: 1.6; }
+  .idea-card .idea-badge {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 3px 9px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 700;
+  }
+  .badge-green { background: rgba(93,187,122,.15); color: #5dbb7a; border: 1px solid rgba(93,187,122,.3); }
+  .badge-yellow { background: rgba(201,168,76,.15); color: var(--gold); border: 1px solid var(--border); }
+  .badge-red { background: rgba(220,80,80,.15); color: #e07070; border: 1px solid rgba(220,80,80,.3); }
+  .tap-hint { font-size: 0.68rem; color: #556677; margin-top: 6px; text-align: center; }
+
+  /* ═══ SALES RESULT ═══ */
+  .sales-block {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 14px;
+    margin-bottom: 12px;
+  }
+  .sales-block .sb-title {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--gold);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .sales-block .sb-text {
+    font-size: 0.82rem;
+    color: #ccd0dd;
+    line-height: 1.75;
+    white-space: pre-wrap;
+  }
+  .copy-btn {
+    margin-top: 8px;
+    padding: 6px 14px;
+    background: rgba(201,168,76,.12);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    color: var(--gold2);
+    font-family: 'Cairo', sans-serif;
+    font-size: 0.73rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .copy-btn.copied { background: rgba(93,187,122,.15); color: #5dbb7a; }
+
+  /* ═══ HISTORY ═══ */
+  .hist-item {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,.07);
+    border-radius: 10px;
+    padding: 11px 13px;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+  }
+  .hist-item:hover { border-color: var(--border); }
+  .hist-label { font-size: 0.8rem; color: #ccd0dd; }
+  .hist-date { font-size: 0.68rem; color: #556677; }
+  .hist-empty { text-align: center; color: #445566; font-size: 0.82rem; padding: 30px 0; }
+
+  /* ═══ TOAST ═══ */
+  #toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(60px);
+    background: #1e3a2e;
+    border: 1px solid #5dbb7a;
+    color: #5dbb7a;
+    padding: 10px 20px;
+    border-radius: 24px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    z-index: 999;
+    transition: transform .3s ease;
+    white-space: nowrap;
+  }
+  #toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ═══ DIVIDER ═══ */
+  .divider { height: 1px; background: var(--border); margin: 14px 0; }
+
+  .section-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: #4a5a6a;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .model-note {
+    font-size: 0.7rem;
+    color: #445566;
+    margin-top: 6px;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>⚡ الأداة الموحدة</h1>
+  <p>مولّد أفكار الدخل · وكيل المبيعات الذكي</p>
+</header>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('ideas')">💡 أفكار الدخل</button>
+  <button class="tab" onclick="switchTab('sales')">🤝 وكيل المبيعات</button>
+  <button class="tab" onclick="switchTab('history')">📋 السجل</button>
+</div>
+
+<!-- ══════════════════════════════════
+     TAB 1: IDEAS GENERATOR
+══════════════════════════════════ -->
+<div id="tab-ideas" class="section active">
+
+  <!-- API KEY -->
+  <div class="key-card">
+    <label>🔑 مفتاح Hugging Face API</label>
+    <div class="key-row">
+      <input type="password" id="hf-key" placeholder="hf_xxxxxxxxxxxxxxxxxxxx" />
+      <button class="save-key" onclick="saveKey()">حفظ</button>
+    </div>
+    <div class="key-status" id="key-status">لم يتم حفظ المفتاح بعد</div>
+  </div>
+
+  <!-- FIELDS -->
+  <div class="card">
+    <div class="card-title">🎯 حدّد نشاطك</div>
+
+    <div class="field">
+      <label>المجال الرئيسي</label>
+      <select id="domain">
+        <option value="">اختر المجال...</option>
+        <option value="ملابس أطفال">👕 ملابس أطفال</option>
+        <option value="ملابس نساء">👗 ملابس نساء</option>
+        <option value="إكسسوارات">💍 إكسسوارات وحلي</option>
+        <option value="طعام ومشروبات">🍽️ طعام ومشروبات</option>
+        <option value="عبايات وأزياء محتشمة">🧕 عبايات وأزياء</option>
+        <option value="منتجات منزلية">🏠 منتجات منزلية</option>
+        <option value="تجميل وعناية">💄 تجميل وعناية</option>
+        <option value="خدمات قانونية">⚖️ خدمات قانونية</option>
+        <option value="خدمات تعليمية">📚 خدمات تعليمية</option>
+        <option value="أخرى">✨ أخرى</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>الميزانية المتاحة للبدء</label>
+      <div class="chips" id="budget-chips">
+        <button class="chip" onclick="selectChip(this,'budget')">أقل من 500 جنيه</button>
+        <button class="chip" onclick="selectChip(this,'budget')">500 – 2000 جنيه</button>
+        <button class="chip" onclick="selectChip(this,'budget')">2000 – 5000 جنيه</button>
+        <button class="chip" onclick="selectChip(this,'budget')">أكثر من 5000 جنيه</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>نوع العمل المفضّل</label>
+      <div class="chips" id="worktype-chips">
+        <button class="chip" onclick="selectChip(this,'worktype')">أونلاين فقط</button>
+        <button class="chip" onclick="selectChip(this,'worktype')">من المنزل</button>
+        <button class="chip" onclick="selectChip(this,'worktype')">محل أو بسطة</button>
+        <button class="chip" onclick="selectChip(this,'worktype')">مرن (أي طريقة)</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>معلومات إضافية (اختياري)</label>
+      <textarea id="extra-info" placeholder="مثال: عندي خبرة في الخياطة، أو عندي سيارة للتوصيل..."></textarea>
+    </div>
+
+    <button class="btn-main" id="gen-btn" onclick="generateIdeas()">✨ ولّد أفكار الدخل</button>
+    <div class="model-note">يستخدم Mistral-7B عبر Hugging Face — مجاني تماماً</div>
+  </div>
+
+  <!-- LOADER -->
+  <div class="loader" id="ideas-loader">
+    <div class="dots"><span></span><span></span><span></span></div>
+    <div style="margin-top:10px">الذكاء الاصطناعي يفكّر في أفضل الأفكار لك...</div>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="results" id="ideas-results"></div>
+</div>
+
+<!-- ══════════════════════════════════
+     TAB 2: SALES AGENT
+══════════════════════════════════ -->
+<div id="tab-sales" class="section">
+
+  <div class="card">
+    <div class="card-title">🛍️ وصف منتجك أو خدمتك</div>
+
+    <div class="field">
+      <label>اسم المنتج / الخدمة</label>
+      <input type="text" id="product-name" placeholder="مثال: فستان أطفال قطن صيفي" />
+    </div>
+
+    <div class="field">
+      <label>وصف مختصر</label>
+      <textarea id="product-desc" placeholder="اكتب مميزات المنتج، الخامة، الألوان، السعر..."></textarea>
+    </div>
+
+    <div class="field">
+      <label>السعر</label>
+      <input type="text" id="product-price" placeholder="مثال: 150 جنيه" />
+    </div>
+
+    <div class="field">
+      <label>الجمهور المستهدف</label>
+      <div class="chips" id="audience-chips">
+        <button class="chip" onclick="selectChip(this,'audience')">أمهات</button>
+        <button class="chip" onclick="selectChip(this,'audience')">شباب</button>
+        <button class="chip" onclick="selectChip(this,'audience')">سيدات</button>
+        <button class="chip" onclick="selectChip(this,'audience')">عائلات</button>
+        <button class="chip" onclick="selectChip(this,'audience')">رجال أعمال</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>نوع المحتوى المطلوب</label>
+      <div class="chips" id="content-chips">
+        <button class="chip selected" onclick="selectChip(this,'content')">رسالة واتساب</button>
+        <button class="chip" onclick="selectChip(this,'content')">إعلان فيسبوك</button>
+        <button class="chip" onclick="selectChip(this,'content')">بوست انستغرام</button>
+        <button class="chip" onclick="selectChip(this,'content')">رد على عميل</button>
+      </div>
+    </div>
+
+    <button class="btn-main" id="sales-btn" onclick="generateSales()">🚀 ولّد محتوى المبيعات</button>
+  </div>
+
+  <!-- LOADER -->
+  <div class="loader" id="sales-loader">
+    <div class="dots"><span></span><span></span><span></span></div>
+    <div style="margin-top:10px">وكيل المبيعات يكتب لك أفضل رسالة...</div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="sales-results"></div>
+</div>
+
+<!-- ══════════════════════════════════
+     TAB 3: HISTORY
+══════════════════════════════════ -->
+<div id="tab-history" class="section">
+  <div class="section-label">آخر الجلسات المحفوظة</div>
+  <div id="history-list"></div>
+  <button class="btn-sec" style="width:100%;margin-top:8px" onclick="clearHistory()">🗑️ مسح السجل</button>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+// ═══════════════════════════════
+//  STATE
+// ═══════════════════════════════
+const chips = { budget: null, worktype: null, audience: null, content: 'رسالة واتساب' };
+let history = JSON.parse(localStorage.getItem('ut_history') || '[]');
+
+// ═══════════════════════════════
+//  INIT
+// ═══════════════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem('hf_api_key');
+  if (saved) {
+    document.getElementById('hf-key').value = saved;
+    setKeyStatus(true);
+  }
+  // pre-select first content chip
+  document.querySelector('#content-chips .chip').classList.add('selected');
+  renderHistory();
+});
+
+// ═══════════════════════════════
+//  KEY
+// ═══════════════════════════════
+function saveKey() {
+  const k = document.getElementById('hf-key').value.trim();
+  if (!k.startsWith('hf_')) { showToast('❌ المفتاح يجب أن يبدأ بـ hf_'); return; }
+  localStorage.setItem('hf_api_key', k);
+  setKeyStatus(true);
+  showToast('✅ تم حفظ المفتاح');
+}
+function setKeyStatus(ok) {
+  const el = document.getElementById('key-status');
+  el.textContent = ok ? '✅ المفتاح محفوظ وجاهز' : 'لم يتم حفظ المفتاح بعد';
+  el.className = 'key-status' + (ok ? ' ok' : '');
+}
+function getKey() { return localStorage.getItem('hf_api_key') || ''; }
+
+// ═══════════════════════════════
+//  TABS
+// ═══════════════════════════════
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach((t,i) => {
+    const names = ['ideas','sales','history'];
+    t.classList.toggle('active', names[i] === name);
+  });
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  if (name === 'history') renderHistory();
+}
+
+// ═══════════════════════════════
+//  CHIPS
+// ═══════════════════════════════
+function selectChip(el, group) {
+  const parent = el.closest('.chips');
+  parent.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  chips[group] = el.textContent.trim();
+}
+
+// ═══════════════════════════════
+//  HF API CALL
+// ═══════════════════════════════
+async function callHF(prompt) {
+  const key = getKey();
+  if (!key) throw new Error('لا يوجد مفتاح API محفوظ');
+
+  const response = await fetch(
+    'https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.3',
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + key,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        inputs: prompt,
+        parameters: {
+          max_new_tokens: 900,
+          temperature: 0.75,
+          return_full_text: false
+        }
+      })
+    }
+  );
+
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    if (response.status === 401) throw new Error('مفتاح API غير صحيح');
+    if (response.status === 503) throw new Error('النموذج يُحمَّل الآن، انتظر دقيقة وأعد المحاولة');
+    throw new Error(err.error || 'خطأ من Hugging Face: ' + response.status);
+  }
+
+  const data = await response.json();
+  return (data[0]?.generated_text || '').trim();
+}
+
+// ═══════════════════════════════
+//  IDEAS GENERATOR
+// ═══════════════════════════════
+async function generateIdeas() {
+  if (!getKey()) { showToast('❌ أدخل مفتاح API أولاً'); return; }
+  const domain = document.getElementById('domain').value;
+  if (!domain) { showToast('❌ اختر المجال أولاً'); return; }
+  if (!chips.budget) { showToast('❌ اختر الميزانية'); return; }
+
+  const extra = document.getElementById('extra-info').value.trim();
+  const worktype = chips.worktype || 'مرن';
+
+  const prompt = `<s>[INST] أنت مستشار تجاري خبير. اقترح 4 أفكار دخل إضافي باللغة العربية في مجال "${domain}".
+الميزانية: ${chips.budget}
+نوع العمل: ${worktype}
+${extra ? 'معلومات إضافية: ' + extra : ''}
+
+لكل فكرة اكتب بالتنسيق التالي فقط:
+IDEA_START
+العنوان: [عنوان الفكرة]
+التفاصيل: [شرح مختصر 2-3 جمل]
+الربح المتوقع: [رقم تقريبي شهري]
+مستوى المخاطرة: [منخفض / متوسط / مرتفع]
+IDEA_END
+
+اكتب 4 أفكار فقط باللغة العربية. [/INST]`;
+
+  const btn = document.getElementById('gen-btn');
+  const loader = document.getElementById('ideas-loader');
+  const results = document.getElementById('ideas-results');
+
+  btn.disabled = true;
+  loader.classList.add('show');
+  results.innerHTML = '';
+
+  try {
+    const text = await callHF(prompt);
+    const ideas = parseIdeas(text);
+    if (ideas.length === 0) {
+      results.innerHTML = `<div class="card" style="color:#e07070;font-size:.82rem">⚠️ لم يتم استخراج أفكار. حاول مرة أخرى أو عدّل المدخلات.</div>`;
+    } else {
+      renderIdeas(ideas, domain);
+      saveToHistory('ideas', { domain, ideas });
+    }
+  } catch(e) {
+    showToast('❌ ' + e.message);
+  }
+
+  btn.disabled = false;
+  loader.classList.remove('show');
+}
+
+function parseIdeas(text) {
+  const ideas = [];
+  const blocks = text.split('IDEA_START').slice(1);
+  for (const b of blocks) {
+    const end = b.indexOf('IDEA_END');
+    const block = end > -1 ? b.slice(0, end) : b;
+    const get = (key) => {
+      const m = block.match(new RegExp(key + '[:\\s]+(.+?)(?=\\n[\\u0600-\\u06FF]|$)', 's'));
+      return m ? m[1].trim() : '';
+    };
+    const title = get('العنوان');
+    const details = get('التفاصيل');
+    const profit = get('الربح المتوقع');
+    const risk = get('مستوى المخاطرة');
+    if (title) ideas.push({ title, details, profit, risk });
+  }
+  // fallback: try line parsing
+  if (ideas.length === 0 && text.length > 50) {
+    ideas.push({ title: 'نتيجة الذكاء الاصطناعي', details: text, profit: '', risk: '' });
+  }
+  return ideas;
+}
+
+function renderIdeas(ideas, domain) {
+  const el = document.getElementById('ideas-results');
+  el.innerHTML = `<div class="section-label" style="margin-bottom:10px">💡 ${ideas.length} أفكار لمجال "${domain}"</div>`;
+  ideas.forEach((idea, i) => {
+    const riskClass = idea.risk.includes('منخفض') ? 'badge-green' : idea.risk.includes('مرتفع') ? 'badge-red' : 'badge-yellow';
+    el.innerHTML += `
+    <div class="idea-card" onclick="sendToSales('${escStr(idea.title)}','${escStr(idea.details)}')">
+      <div class="idea-num">${i+1}</div>
+      <div class="idea-title">${idea.title}</div>
+      <div class="idea-body">${idea.details}</div>
+      ${idea.profit ? `<span class="idea-badge badge-green">💰 ${idea.profit}</span>` : ''}
+      ${idea.risk ? `<span class="idea-badge ${riskClass}" style="margin-right:6px">⚡ ${idea.risk}</span>` : ''}
+    </div>`;
+  });
+  el.innerHTML += `<div class="tap-hint">👆 اضغط على أي فكرة لإرسالها مباشرة لوكيل المبيعات</div>`;
+}
+
+function escStr(s) { return (s || '').replace(/'/g, "\\'").replace(/\n/g, ' '); }
+
+function sendToSales(title, details) {
+  document.getElementById('product-name').value = title;
+  document.getElementById('product-desc').value = details;
+  switchTab('sales');
+  showToast('✅ تم إرسال الفكرة لوكيل المبيعات');
+}
+
+// ═══════════════════════════════
+//  SALES AGENT
+// ═══════════════════════════════
+async function generateSales() {
+  if (!getKey()) { showToast('❌ أدخل مفتاح API أولاً'); return; }
+  const name = document.getElementById('product-name').value.trim();
+  const desc = document.getElementById('product-desc').value.trim();
+  const price = document.getElementById('product-price').value.trim();
+  if (!name) { showToast('❌ أدخل اسم المنتج'); return; }
+
+  const audience = chips.audience || 'عملاء عامون';
+  const contentType = chips.content || 'رسالة واتساب';
+
+  const prompt = `<s>[INST] أنت خبير تسويق ومبيعات محترف. اكتب ${contentType} احترافية باللغة العربية المصرية لتسويق هذا المنتج:
+
+المنتج: ${name}
+${desc ? 'الوصف: ' + desc : ''}
+${price ? 'السعر: ' + price : ''}
+الجمهور المستهدف: ${audience}
+
+اكتب نسختين مختلفتين (نسخة 1 ونسخة 2) من ${contentType}. كل نسخة جذابة ومقنعة وتحفّز على الشراء. استخدم إيموجي مناسبة. [/INST]`;
+
+  const btn = document.getElementById('sales-btn');
+  const loader = document.getElementById('sales-loader');
+  const results = document.getElementById('sales-results');
+
+  btn.disabled = true;
+  loader.classList.add('show');
+  results.innerHTML = '';
+
+  try {
+    const text = await callHF(prompt);
+    renderSales(text, contentType, name);
+    saveToHistory('sales', { name, contentType, text });
+  } catch(e) {
+    showToast('❌ ' + e.message);
+  }
+
+  btn.disabled = false;
+  loader.classList.remove('show');
+}
+
+function renderSales(text, contentType, name) {
+  const el = document.getElementById('sales-results');
+
+  // Try to split into two versions
+  const parts = text.split(/نسخة\s*[٢2]|النسخة الثانية/i);
+  const v1 = parts[0].replace(/نسخة\s*[١1]|النسخة الأولى/i, '').trim();
+  const v2 = parts[1] ? parts[1].trim() : '';
+
+  el.innerHTML = `<div class="section-label" style="margin-bottom:10px">📝 ${contentType} — ${name}</div>`;
+
+  el.innerHTML += salesBlock('النسخة الأولى', '✏️', v1);
+  if (v2) el.innerHTML += salesBlock('النسخة الثانية', '✨', v2);
+  if (!v2) el.innerHTML += salesBlock('النتيجة الكاملة', '📄', text);
+}
+
+function salesBlock(title, icon, text) {
+  const id = 'sb_' + Math.random().toString(36).slice(2);
+  return `
+  <div class="sales-block">
+    <div class="sb-title">${icon} ${title}</div>
+    <div class="sb-text" id="${id}">${text}</div>
+    <button class="copy-btn" onclick="copyText('${id}', this)">📋 نسخ</button>
+  </div>`;
+}
+
+function copyText(id, btn) {
+  const text = document.getElementById(id).textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✅ تم النسخ';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '📋 نسخ'; btn.classList.remove('copied'); }, 2000);
+  }).catch(() => showToast('❌ تعذّر النسخ'));
+}
+
+// ═══════════════════════════════
+//  HISTORY
+// ═══════════════════════════════
+function saveToHistory(type, data) {
+  history.unshift({ type, data, date: new Date().toLocaleString('ar-EG') });
+  if (history.length > 20) history = history.slice(0, 20);
+  localStorage.setItem('ut_history', JSON.stringify(history));
+}
+
+function renderHistory() {
+  const el = document.getElementById('history-list');
+  if (history.length === 0) {
+    el.innerHTML = '<div class="hist-empty">📭 لا يوجد سجل بعد<br>ولّد أفكاراً أو محتوى مبيعات وستظهر هنا</div>';
+    return;
+  }
+  el.innerHTML = history.map((h, i) => `
+    <div class="hist-item" onclick="restoreHistory(${i})">
+      <div>
+        <div class="hist-label">${h.type === 'ideas' ? '💡 أفكار: ' + h.data.domain : '🤝 مبيعات: ' + h.data.name}</div>
+        <div class="hist-date">${h.date}</div>
+      </div>
+      <span style="color:#4a5a6a;font-size:1rem">›</span>
+    </div>
+  `).join('');
+}
+
+function restoreHistory(i) {
+  const h = history[i];
+  if (h.type === 'ideas') {
+    switchTab('ideas');
+    renderIdeas(h.data.ideas, h.data.domain);
+  } else {
+    switchTab('sales');
+    document.getElementById('product-name').value = h.data.name || '';
+    renderSales(h.data.text, h.data.contentType, h.data.name);
+  }
+  showToast('✅ تم استعادة الجلسة');
+}
+
+function clearHistory() {
+  if (!confirm('هل تريد مسح كل السجل؟')) return;
+  history = [];
+  localStorage.removeItem('ut_history');
+  renderHistory();
+  showToast('🗑️ تم مسح السجل');
+}
+
+// ═══════════════════════════════
+//  TOAST
+// ═══════════════════════════════
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+</script>
+</body>
+</html>
