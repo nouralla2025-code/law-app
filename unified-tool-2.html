@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الأداة الموحدة</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap');
+:root{
+  --ink:#0f0f1e; --ink2:#1a1a2e; --gold:#c9a84c; --gold2:#f0d080;
+  --glass:rgba(255,255,255,0.06); --border:rgba(201,168,76,0.22); --r:14px;
+  --green:#5dbb7a; --red:#e07070;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Cairo',sans-serif;background:var(--ink);color:#e8e0cc;min-height:100vh;padding-bottom:60px;}
+
+/* HEADER */
+header{background:linear-gradient(135deg,#0a0a18,#1a1a2e,#0d1b3e);border-bottom:1px solid var(--border);padding:14px 16px;text-align:center;position:sticky;top:0;z-index:200;}
+header h1{font-size:1.15rem;font-weight:900;background:linear-gradient(90deg,var(--gold),var(--gold2),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+header p{font-size:0.68rem;color:#6677aa;margin-top:2px;}
+
+/* TABS */
+.tabs{display:flex;margin:10px 10px 0;background:rgba(255,255,255,0.04);border-radius:12px;padding:4px;gap:3px;}
+.tab{flex:1;padding:8px 3px;border:none;border-radius:9px;background:transparent;color:#6677aa;font-family:'Cairo',sans-serif;font-size:0.72rem;font-weight:700;cursor:pointer;transition:all .25s;line-height:1.3;}
+.tab.active{background:linear-gradient(135deg,#c9a84c,#9a7228);color:#fff;box-shadow:0 2px 10px rgba(201,168,76,.28);}
+
+/* SECTIONS */
+.sec{display:none;padding:11px;animation:fu .28s ease;}
+.sec.active{display:block;}
+@keyframes fu{from{opacity:0;transform:translateY(7px);}to{opacity:1;transform:translateY(0);}}
+
+/* KEY CARD */
+.kcard{background:rgba(201,168,76,.07);border:1px solid var(--border);border-radius:var(--r);padding:13px;margin-bottom:12px;}
+.kcard label{font-size:0.72rem;color:var(--gold);font-weight:700;display:block;margin-bottom:7px;}
+.krow{display:flex;gap:7px;}
+.kinput{flex:1;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;padding:9px 11px;color:#e8e0cc;font-family:'Cairo',sans-serif;font-size:0.75rem;direction:ltr;}
+.kinput:focus{outline:none;border-color:var(--gold);}
+.ksave{background:var(--gold);border:none;border-radius:8px;padding:9px 13px;color:#1a1a2e;font-family:'Cairo',sans-serif;font-weight:900;font-size:0.75rem;cursor:pointer;}
+.kst{font-size:0.68rem;margin-top:5px;color:#445566;}
+.kst.on{color:var(--green);}
+
+/* CARD */
+.card{background:var(--glass);border:1px solid var(--border);border-radius:var(--r);padding:13px;margin-bottom:11px;}
+.ctitle{font-size:0.78rem;font-weight:700;color:var(--gold);margin-bottom:10px;}
+
+/* FIELD */
+.f{margin-bottom:10px;}
+.f label{font-size:0.72rem;color:#9aabbb;display:block;margin-bottom:4px;font-weight:600;}
+.f select,.f input,.f textarea{width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;padding:9px 11px;color:#e8e0cc;font-family:'Cairo',sans-serif;font-size:0.82rem;}
+.f select:focus,.f input:focus,.f textarea:focus{outline:none;border-color:var(--gold);}
+.f textarea{resize:vertical;min-height:68px;}
+.f select option{background:#1a1a2e;}
+
+/* CHIPS */
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;}
+.chip{padding:5px 10px;border-radius:16px;border:1px solid var(--border);background:rgba(255,255,255,0.04);color:#9aabbb;font-size:0.7rem;font-family:'Cairo',sans-serif;cursor:pointer;transition:all .18s;}
+.chip.sel{background:rgba(201,168,76,.18);border-color:var(--gold);color:var(--gold2);}
+
+/* BUTTON */
+.btn{width:100%;padding:12px;background:linear-gradient(135deg,#c9a84c,#9a7228);border:none;border-radius:var(--r);color:#fff;font-family:'Cairo',sans-serif;font-size:0.9rem;font-weight:900;cursor:pointer;transition:opacity .2s,transform .1s;margin-top:4px;}
+.btn:active{opacity:.82;transform:scale(.98);}
+.btn:disabled{opacity:.4;cursor:not-allowed;}
+.note{font-size:0.65rem;color:#334455;text-align:center;margin-top:4px;}
+.btn-sm{padding:7px 14px;background:rgba(201,168,76,.1);border:1px solid var(--border);border-radius:8px;color:var(--gold2);font-family:'Cairo',sans-serif;font-size:0.72rem;font-weight:700;cursor:pointer;}
+
+/* LOADER */
+.ldr{display:none;text-align:center;padding:20px;color:var(--gold);font-size:0.77rem;}
+.ldr.on{display:block;}
+.dots span{display:inline-block;width:7px;height:7px;margin:0 3px;border-radius:50%;background:var(--gold);animation:bo .9s infinite;}
+.dots span:nth-child(2){animation-delay:.15s;}
+.dots span:nth-child(3){animation-delay:.3s;}
+@keyframes bo{0%,80%,100%{transform:translateY(0);opacity:.3;}40%{transform:translateY(-7px);opacity:1;}}
+
+/* IDEA CARD */
+.ideas-wrap{margin-top:10px;}
+.icard{background:rgba(255,255,255,0.04);border:1px solid rgba(201,168,76,.18);border-radius:var(--r);padding:12px;margin-bottom:8px;cursor:pointer;transition:all .2s;position:relative;}
+.icard:active{border-color:var(--gold);background:rgba(201,168,76,.07);}
+.inum{position:absolute;top:9px;left:10px;font-size:0.65rem;color:var(--gold);font-weight:900;}
+.ititle{font-size:0.86rem;font-weight:700;color:var(--gold2);margin-bottom:4px;padding-left:26px;}
+.ibody{font-size:0.74rem;color:#9aabbb;line-height:1.58;}
+.ibadges{margin-top:6px;display:flex;gap:5px;flex-wrap:wrap;}
+.badge{padding:2px 8px;border-radius:10px;font-size:0.65rem;font-weight:700;}
+.bg{background:rgba(93,187,122,.12);color:var(--green);border:1px solid rgba(93,187,122,.22);}
+.by{background:rgba(201,168,76,.12);color:var(--gold);border:1px solid var(--border);}
+.br{background:rgba(220,80,80,.12);color:var(--red);border:1px solid rgba(220,80,80,.22);}
+.tap-hint{font-size:0.64rem;color:#334455;text-align:center;margin-top:4px;}
+
+/* PLATFORMS GRID */
+.plat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;}
+.plat-card{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:11px;padding:11px;}
+.plat-head{display:flex;align-items:center;gap:6px;margin-bottom:7px;}
+.plat-icon{font-size:1.1rem;}
+.plat-name{font-size:0.72rem;font-weight:700;color:var(--gold2);}
+.plat-text{font-size:0.71rem;color:#9aabbb;line-height:1.6;white-space:pre-wrap;}
+.plat-copy{margin-top:7px;padding:5px 11px;background:rgba(201,168,76,.1);border:1px solid var(--border);border-radius:7px;color:var(--gold2);font-family:'Cairo',sans-serif;font-size:0.67rem;font-weight:700;cursor:pointer;width:100%;}
+.plat-copy.done{background:rgba(93,187,122,.12);color:var(--green);}
+
+/* CHAT */
+.chat-wrap{display:flex;flex-direction:column;height:calc(100vh - 180px);min-height:400px;}
+.chat-msgs{flex:1;overflow-y:auto;padding:10px 0;display:flex;flex-direction:column;gap:10px;}
+.msg{max-width:88%;padding:10px 13px;border-radius:14px;font-size:0.78rem;line-height:1.65;}
+.msg.ai{background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.2);color:#ddd8cc;align-self:flex-start;border-bottom-right-radius:4px;}
+.msg.me{background:linear-gradient(135deg,#c9a84c,#9a7228);color:#fff;align-self:flex-end;border-bottom-left-radius:4px;}
+.msg.sys{background:rgba(93,187,122,.08);border:1px solid rgba(93,187,122,.15);color:#7dcca0;align-self:center;font-size:0.68rem;text-align:center;max-width:95%;}
+.chat-bottom{padding-top:8px;border-top:1px solid var(--border);}
+.chat-input-row{display:flex;gap:7px;}
+.chat-input{flex:1;background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:10px;padding:10px 12px;color:#e8e0cc;font-family:'Cairo',sans-serif;font-size:0.8rem;resize:none;max-height:90px;}
+.chat-input:focus{outline:none;border-color:var(--gold);}
+.send-btn{background:linear-gradient(135deg,#c9a84c,#9a7228);border:none;border-radius:10px;padding:10px 14px;color:#fff;font-size:1rem;cursor:pointer;flex-shrink:0;}
+.send-btn:disabled{opacity:.4;}
+.chat-hints{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:7px;}
+.hint{padding:4px 10px;border-radius:14px;border:1px solid var(--border);background:rgba(255,255,255,0.04);color:#7788aa;font-size:0.65rem;cursor:pointer;font-family:'Cairo',sans-serif;}
+.hint:active{background:rgba(201,168,76,.12);}
+.idea-context{background:rgba(201,168,76,.07);border:1px solid var(--border);border-radius:9px;padding:9px 11px;margin-bottom:8px;font-size:0.7rem;color:#9aabbb;}
+.idea-context b{color:var(--gold2);}
+
+/* TOAST */
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(70px);padding:9px 18px;border-radius:20px;font-size:0.77rem;font-weight:700;z-index:999;transition:transform .3s;white-space:nowrap;background:#1a3028;border:1px solid var(--green);color:var(--green);}
+#toast.on{transform:translateX(-50%) translateY(0);}
+#toast.err{background:#301a1a;border-color:var(--red);color:var(--red);}
+
+.slabel{font-size:0.65rem;font-weight:700;letter-spacing:1.3px;color:#2a3a4a;text-transform:uppercase;margin-bottom:8px;}
+.divider{height:1px;background:var(--border);margin:10px 0;}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>⚡ الأداة الموحدة</h1>
+  <p>أفكار الدخل · الترويج على كل المنصات · وكيل ذكي للدردشة</p>
+</header>
+
+<div class="tabs">
+  <button class="tab active" onclick="go('ideas')">💡 أفكار</button>
+  <button class="tab" onclick="go('promo')">📣 ترويج</button>
+  <button class="tab" onclick="go('chat')">🤖 وكيل ذكي</button>
+</div>
+
+<!-- ══════════════════════════════════
+     TAB 1: IDEA GENERATOR
+══════════════════════════════════ -->
+<div id="tab-ideas" class="sec active">
+
+  <div class="kcard">
+    <label>🔑 مفتاح Groq API (مجاني من console.groq.com)</label>
+    <div class="krow">
+      <input class="kinput" type="password" id="gkey" placeholder="gsk_..." />
+      <button class="ksave" onclick="saveKey()">حفظ</button>
+    </div>
+    <div class="kst" id="kst">لم يتم حفظ المفتاح بعد</div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle">🎯 حدّد نشاطك وأنا أولّد أفضل الأفكار</div>
+
+    <div class="f">
+      <label>المجال الرئيسي</label>
+      <select id="domain">
+        <option value="">اختر المجال...</option>
+        <option>👕 ملابس أطفال</option>
+        <option>👗 ملابس نساء</option>
+        <option>💍 إكسسوارات وحلي</option>
+        <option>🍽️ طعام ومشروبات</option>
+        <option>🧕 عبايات وأزياء محتشمة</option>
+        <option>🏠 منتجات منزلية</option>
+        <option>💄 تجميل وعناية</option>
+        <option>⚖️ خدمات قانونية</option>
+        <option>📚 خدمات تعليمية</option>
+        <option>✨ أخرى</option>
+      </select>
+    </div>
+
+    <div class="f">
+      <label>الميزانية المتاحة</label>
+      <div class="chips" id="c-bud">
+        <button class="chip" onclick="pick(this,'bud')">أقل من 500 جنيه</button>
+        <button class="chip" onclick="pick(this,'bud')">500 – 2000 جنيه</button>
+        <button class="chip" onclick="pick(this,'bud')">2000 – 5000 جنيه</button>
+        <button class="chip" onclick="pick(this,'bud')">أكثر من 5000 جنيه</button>
+      </div>
+    </div>
+
+    <div class="f">
+      <label>نوع العمل المفضّل</label>
+      <div class="chips" id="c-wrk">
+        <button class="chip" onclick="pick(this,'wrk')">أونلاين فقط</button>
+        <button class="chip" onclick="pick(this,'wrk')">من المنزل</button>
+        <button class="chip" onclick="pick(this,'wrk')">محل أو بسطة</button>
+        <button class="chip" onclick="pick(this,'wrk')">مرن</button>
+      </div>
+    </div>
+
+    <div class="f">
+      <label>معلومات إضافية عنك (اختياري)</label>
+      <textarea id="extra" placeholder="مهاراتك، خبراتك، إمكانياتك المتاحة..."></textarea>
+    </div>
+
+    <button class="btn" id="ibtn" onclick="genIdeas()">✨ ولّد أفكار الدخل</button>
+    <div class="note">يستخدم Groq + Llama 3.3 70B — مجاني 100%</div>
+  </div>
+
+  <div class="ldr" id="ildr"><div class="dots"><span></span><span></span><span></span></div><div style="margin-top:8px">الذكاء الاصطناعي يفكّر في أفضل الأفكار لك...</div></div>
+  <div id="ir"></div>
+</div>
+
+<!-- ══════════════════════════════════
+     TAB 2: PROMO CONTENT (ALL PLATFORMS)
+══════════════════════════════════ -->
+<div id="tab-promo" class="sec">
+
+  <div class="card">
+    <div class="ctitle">📣 ولّد محتوى ترويجي لكل المنصات</div>
+
+    <div class="f">
+      <label>اسم المنتج / الفكرة / الخدمة</label>
+      <input type="text" id="pname" placeholder="مثال: بيع ملابس أطفال أونلاين" />
+    </div>
+    <div class="f">
+      <label>التفاصيل والمميزات</label>
+      <textarea id="pdesc" placeholder="اذكر المميزات، السعر، الاستهداف، أي تفاصيل مهمة..."></textarea>
+    </div>
+    <div class="f">
+      <label>الجمهور المستهدف</label>
+      <div class="chips" id="c-aud">
+        <button class="chip" onclick="pick(this,'aud')">أمهات</button>
+        <button class="chip" onclick="pick(this,'aud')">شباب</button>
+        <button class="chip" onclick="pick(this,'aud')">سيدات</button>
+        <button class="chip" onclick="pick(this,'aud')">عائلات</button>
+        <button class="chip" onclick="pick(this,'aud')">رجال أعمال</button>
+        <button class="chip" onclick="pick(this,'aud')">الكل</button>
+      </div>
+    </div>
+
+    <button class="btn" id="pbtn" onclick="genPromo()">🚀 ولّد محتوى كل المنصات دفعة واحدة</button>
+    <div class="note">واتساب · فيسبوك · انستغرام · تيك توك · تويتر · لينكدإن</div>
+  </div>
+
+  <div class="ldr" id="pldr"><div class="dots"><span></span><span></span><span></span></div><div style="margin-top:8px">يجهّز محتوى 6 منصات...</div></div>
+  <div id="pr"></div>
+</div>
+
+<!-- ══════════════════════════════════
+     TAB 3: SMART CHAT AGENT
+══════════════════════════════════ -->
+<div id="tab-chat" class="sec">
+  <div class="chat-wrap">
+
+    <div id="idea-ctx" class="idea-context" style="display:none">
+      <b>🎯 الفكرة المحددة:</b> <span id="ctx-text"></span>
+    </div>
+
+    <div class="chat-msgs" id="cmsg"></div>
+
+    <div class="chat-bottom">
+      <div class="chat-hints" id="hints">
+        <button class="hint" onclick="sendHint(this)">💰 كيف أبدأ وأربح؟</button>
+        <button class="hint" onclick="sendHint(this)">📦 كيف أجهّز المنتج؟</button>
+        <button class="hint" onclick="sendHint(this)">👥 كيف أجذب عملاء؟</button>
+        <button class="hint" onclick="sendHint(this)">💬 أنا عميل — اقنعني</button>
+        <button class="hint" onclick="sendHint(this)">⚠️ ما المخاطر؟</button>
+        <button class="hint" onclick="sendHint(this)">📈 كيف أكبّر المشروع؟</button>
+      </div>
+      <div class="chat-input-row">
+        <textarea class="chat-input" id="cinp" rows="1" placeholder="اسألني أي شيء عن فكرتك..." onkeydown="ck(event)"></textarea>
+        <button class="send-btn" id="sbtn" onclick="sendChat()">➤</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ─── STATE ───────────────────────────────
+const S = { bud:null, wrk:null, aud:null };
+let chatHistory = [];
+let currentIdea = '';
+
+// ─── INIT ─────────────────────────────────
+window.onload = () => {
+  const k = localStorage.getItem('groq_key');
+  if(k){ document.getElementById('gkey').value=k; setkst(true); }
+  addMsg('ai', '👋 أهلاً! أنا وكيلك الذكي.\n\nأستطيع:\n• مناقشة فكرة نشاطك التجاري بعمق\n• إخبارك كيف تبدأ وتربح\n• الرد على أسئلة عملائك بدقة\n• مساعدتك في كل خطوة\n\nاسألني أي شيء! 🚀');
+};
+
+// ─── KEY ──────────────────────────────────
+function saveKey(){
+  const k=document.getElementById('gkey').value.trim();
+  if(!k.startsWith('gsk_')){ toast('❌ المفتاح يبدأ بـ gsk_',1); return; }
+  localStorage.setItem('groq_key',k);
+  setkst(true); toast('✅ تم حفظ المفتاح');
+}
+function setkst(ok){
+  const el=document.getElementById('kst');
+  el.textContent=ok?'✅ المفتاح محفوظ وجاهز':'لم يتم حفظ المفتاح بعد';
+  el.className='kst'+(ok?' on':'');
+}
+function getKey(){ return localStorage.getItem('groq_key')||''; }
+
+// ─── TABS ─────────────────────────────────
+function go(name){
+  ['ideas','promo','chat'].forEach((n,i)=>{
+    document.querySelectorAll('.tab')[i].classList.toggle('active',n===name);
+  });
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  if(name==='chat') setTimeout(()=>scrollChat(),100);
+}
+
+// ─── CHIPS ────────────────────────────────
+function pick(el,g){
+  el.closest('.chips').querySelectorAll('.chip').forEach(c=>c.classList.remove('sel'));
+  el.classList.add('sel');
+  S[g]=el.textContent.trim();
+}
+
+// ─── GROQ API ─────────────────────────────
+async function groq(messages, sys){
+  const k=getKey();
+  if(!k) throw new Error('أدخل مفتاح Groq أولاً من console.groq.com');
+  const msgs = sys ? [{role:'system',content:sys},...messages] : messages;
+  const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+k},
+    body:JSON.stringify({model:'llama-3.3-70b-versatile',max_tokens:1800,temperature:0.75,messages:msgs})
+  });
+  if(!r.ok){
+    const e=await r.json().catch(()=>({}));
+    if(r.status===401) throw new Error('المفتاح غير صحيح');
+    if(r.status===429) throw new Error('تجاوزت الحد — انتظر دقيقة');
+    throw new Error(e.error?.message||'خطأ '+r.status);
+  }
+  const d=await r.json();
+  return d.choices?.[0]?.message?.content||'';
+}
+
+// ─── IDEAS ────────────────────────────────
+async function genIdeas(){
+  if(!getKey()){ toast('❌ أدخل مفتاح Groq أولاً',1); return; }
+  const dom=document.getElementById('domain').value;
+  if(!dom){ toast('❌ اختر المجال',1); return; }
+  if(!S.bud){ toast('❌ اختر الميزانية',1); return; }
+  const extra=document.getElementById('extra').value.trim();
+  const wrk=S.wrk||'مرن';
+
+  const sys=`أنت مستشار تجاري خبير في السوق المصري. تقدم أفكار دخل واقعية وعملية باللغة العربية المصرية البسيطة.`;
+  const user=`اقترح 4 أفكار دخل عملية في مجال "${dom}".
+الميزانية: ${S.bud} | نوع العمل: ${wrk}${extra?'\nمعلومات: '+extra:''}
+
+لكل فكرة اكتب بهذا الشكل الحرفي:
+---
+الفكرة: [العنوان المختصر]
+الشرح: [شرح عملي 2-3 جمل]
+خطوات البدء: [3 خطوات عملية مرقمة]
+الربح المتوقع: [رقم شهري تقريبي]
+المخاطرة: [منخفض أو متوسط أو مرتفع]
+---`;
+
+  const btn=document.getElementById('ibtn');
+  const ldr=document.getElementById('ildr');
+  const res=document.getElementById('ir');
+  btn.disabled=true; ldr.classList.add('on'); res.innerHTML='';
+
+  try{
+    const txt=await groq([{role:'user',content:user}],sys);
+    const ideas=parseIdeas(txt);
+    if(!ideas.length){
+      res.innerHTML=`<div class="card" style="color:#e07070;font-size:.75rem;white-space:pre-wrap">${txt}</div>`;
+    } else {
+      renderIdeas(ideas,dom);
+    }
+  }catch(e){ toast('❌ '+e.message,1); }
+  btn.disabled=false; ldr.classList.remove('on');
+}
+
+function parseIdeas(txt){
+  const ideas=[];
+  const blocks=txt.split('---').filter(b=>b.trim().length>15);
+  for(const b of blocks){
+    const g=k=>{const m=b.match(new RegExp(k+'[:\\s]+(.+?)(?=\\n[\\u0600-\\u06FF🎯💡⚡💰]|$)','s'));return m?m[1].trim():'';};
+    const title=g('الفكرة'), details=g('الشرح'), steps=g('خطوات البدء'), profit=g('الربح المتوقع'), risk=g('المخاطرة');
+    if(title&&details) ideas.push({title,details,steps,profit,risk});
+  }
+  return ideas;
+}
+
+function renderIdeas(ideas,dom){
+  const el=document.getElementById('ir');
+  el.innerHTML=`<div class="slabel" style="margin-bottom:8px">💡 ${ideas.length} أفكار — ${dom}</div>`;
+  ideas.forEach((idea,i)=>{
+    const rc=idea.risk.includes('منخفض')?'bg':idea.risk.includes('مرتفع')?'br':'by';
+    const t=esc(idea.title+' — '+idea.details+(idea.steps?'\n\nخطوات البدء:\n'+idea.steps:''));
+    el.innerHTML+=`
+    <div class="icard" onclick="useIdea('${esc(idea.title)}','${t}')">
+      <div class="inum">${i+1}</div>
+      <div class="ititle">${idea.title}</div>
+      <div class="ibody">${idea.details}</div>
+      ${idea.steps?`<div class="ibody" style="margin-top:5px;color:#778899"><b style="color:var(--gold2)">خطوات البدء:</b><br>${idea.steps}</div>`:''}
+      <div class="ibadges">
+        ${idea.profit?`<span class="badge bg">💰 ${idea.profit}</span>`:''}
+        ${idea.risk?`<span class="badge ${rc}">⚡ ${idea.risk}</span>`:''}
+      </div>
+    </div>`;
+  });
+  el.innerHTML+=`<div class="tap-hint">👆 اضغط على أي فكرة لمناقشتها مع الوكيل الذكي أو ترويجها</div>`;
+}
+
+function useIdea(title,detail){
+  // Set in promo tab
+  document.getElementById('pname').value=title;
+  document.getElementById('pdesc').value=detail.replace(/\\n/g,'\n');
+  // Set in chat tab
+  currentIdea=title;
+  document.getElementById('ctx-text').textContent=title;
+  document.getElementById('idea-ctx').style.display='block';
+  // Add system message to chat
+  chatHistory=[];
+  const intro=`أنا مهتم بفكرة: "${title}". ساعدني أناقشها وأنفّذها وأربح منها.`;
+  addMsg('sys','📌 تم تحديد الفكرة: '+title+'\nاضغط على وكيل ذكي لمناقشتها أو على ترويج لتجهيز المحتوى');
+  toast('✅ تم اختيار الفكرة — اضغط ترويج أو وكيل ذكي');
+}
+
+// ─── PROMO ALL PLATFORMS ──────────────────
+async function genPromo(){
+  if(!getKey()){ toast('❌ أدخل مفتاح Groq أولاً',1); return; }
+  const name=document.getElementById('pname').value.trim();
+  if(!name){ toast('❌ أدخل اسم المنتج أو الفكرة',1); return; }
+  const desc=document.getElementById('pdesc').value.trim();
+  const aud=S.aud||'عملاء عامون';
+
+  const sys=`أنت خبير تسويق رقمي متخصص في السوق المصري والعربي. تكتب محتوى تسويقي احترافي وجذاب لكل منصة بأسلوبها المناسب باللغة العربية المصرية مع إيموجي.`;
+
+  const user=`اكتب محتوى تسويقي لـ"${name}"${desc?'\nالتفاصيل: '+desc:''}\nالجمهور: ${aud}
+
+اكتب بهذا الشكل الحرفي بالضبط (لكل منصة عنوان وتاليه المحتوى مباشرة):
+
+WHATSAPP:
+[رسالة واتساب جذابة ومختصرة مع إيموجي]
+
+FACEBOOK:
+[بوست فيسبوك كامل مقنع يحفّز التفاعل]
+
+INSTAGRAM:
+[كابشن انستغرام قصير جذاب مع هاشتاقات]
+
+TIKTOK:
+[سكريبت فيديو تيك توك 30 ثانية خطوة بخطوة]
+
+TWITTER:
+[تغريدة مختصرة ومؤثرة في 280 حرف]
+
+LINKEDIN:
+[بوست لينكدإن احترافي يستهدف رجال الأعمال]`;
+
+  const btn=document.getElementById('pbtn');
+  const ldr=document.getElementById('pldr');
+  const res=document.getElementById('pr');
+  btn.disabled=true; ldr.classList.add('on'); res.innerHTML='';
+
+  try{
+    const txt=await groq([{role:'user',content:user}],sys);
+    renderPromo(txt,name);
+  }catch(e){ toast('❌ '+e.message,1); }
+  btn.disabled=false; ldr.classList.remove('on');
+}
+
+const PLATS=[
+  {key:'WHATSAPP',icon:'💬',name:'واتساب'},
+  {key:'FACEBOOK',icon:'📘',name:'فيسبوك'},
+  {key:'INSTAGRAM',icon:'📸',name:'انستغرام'},
+  {key:'TIKTOK',icon:'🎵',name:'تيك توك'},
+  {key:'TWITTER',icon:'🐦',name:'تويتر / X'},
+  {key:'LINKEDIN',icon:'💼',name:'لينكدإن'},
+];
+
+function renderPromo(txt,name){
+  const el=document.getElementById('pr');
+  el.innerHTML=`<div class="slabel" style="margin-bottom:8px">📣 محتوى ترويجي — ${name}</div><div class="plat-grid">`;
+  PLATS.forEach(p=>{
+    const re=new RegExp(p.key+':\\s*([\\s\\S]+?)(?=\\n[A-Z]+:|$)','i');
+    const m=txt.match(re);
+    const content=m?m[1].trim():'(لم يتم توليد محتوى لهذه المنصة)';
+    const id='p'+Math.random().toString(36).slice(2);
+    el.innerHTML+=`
+    <div class="plat-card">
+      <div class="plat-head"><span class="plat-icon">${p.icon}</span><span class="plat-name">${p.name}</span></div>
+      <div class="plat-text" id="${id}">${content}</div>
+      <button class="plat-copy" onclick="cpText('${id}',this)">📋 نسخ</button>
+    </div>`;
+  });
+  el.innerHTML+='</div>';
+}
+
+function cpText(id,btn){
+  navigator.clipboard.writeText(document.getElementById(id).textContent)
+    .then(()=>{btn.textContent='✅ تم';btn.classList.add('done');setTimeout(()=>{btn.textContent='📋 نسخ';btn.classList.remove('done');},1800);})
+    .catch(()=>toast('❌ تعذّر النسخ',1));
+}
+
+// ─── SMART CHAT AGENT ─────────────────────
+function addMsg(role,text){
+  const el=document.getElementById('cmsg');
+  const div=document.createElement('div');
+  div.className='msg '+role;
+  div.textContent=text;
+  el.appendChild(div);
+  scrollChat();
+}
+
+function scrollChat(){
+  const el=document.getElementById('cmsg');
+  el.scrollTop=el.scrollHeight;
+}
+
+function sendHint(el){
+  document.getElementById('cinp').value=el.textContent.trim();
+  sendChat();
+}
+
+function ck(e){
+  if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); sendChat(); }
+}
+
+async function sendChat(){
+  if(!getKey()){ toast('❌ أدخل مفتاح Groq أولاً',1); go('ideas'); return; }
+  const inp=document.getElementById('cinp');
+  const msg=inp.value.trim();
+  if(!msg) return;
+  inp.value='';
+
+  addMsg('me',msg);
+  chatHistory.push({role:'user',content:msg});
+
+  const sbtn=document.getElementById('sbtn');
+  sbtn.disabled=true;
+
+  const sys=`أنت وكيل تجاري ذكي متخصص في السوق المصري. مهمتك:
+1. مساعدة صاحب المشروع على فهم وتطوير فكرته التجارية
+2. الرد على استفسارات العملاء بذكاء ولباقة
+3. تقديم نصائح تسويقية وعملية دقيقة
+4. التحدث بالعربية المصرية البسيطة الودودة
+${currentIdea?'5. الفكرة التجارية الحالية: '+currentIdea:''}
+
+أجب بشكل مفيد ومباشر. إذا سألك أحد عن الفكرة كعميل، تعامل معه كعميل حقيقي وأقنعه بالشراء.`;
+
+  try{
+    const reply=await groq(chatHistory,sys);
+    chatHistory.push({role:'assistant',content:reply});
+    if(chatHistory.length>20) chatHistory=chatHistory.slice(-18);
+    addMsg('ai',reply);
+  }catch(e){
+    addMsg('sys','❌ خطأ: '+e.message);
+    toast('❌ '+e.message,1);
+  }
+  sbtn.disabled=false;
+  setTimeout(()=>scrollChat(),100);
+}
+
+// ─── HELPERS ──────────────────────────────
+function esc(s){return(s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\n/g,'\\n');}
+
+function toast(msg,err){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.className='on'+(err?' err':'');
+  setTimeout(()=>t.className='',3000);
+}
+</script>
+</body>
+</html>
